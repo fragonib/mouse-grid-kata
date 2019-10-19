@@ -37,4 +37,16 @@ class MapSpec extends Specification {
         obstacles.size() == 1
     }
 
+    def 'complains if movement is outside map'() {
+        given:
+        Map map = new Map(new Area(5, 5))
+
+        when:
+        map.move(new Point(0, 0), new Step(10, 0))
+
+        then:
+        IllegalArgumentException ex = thrown()
+        ex.message == 'New position is outside map'
+    }
+
 }
