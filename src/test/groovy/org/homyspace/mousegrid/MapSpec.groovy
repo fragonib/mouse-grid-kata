@@ -78,7 +78,7 @@ class MapSpec extends Specification {
         Map map = new Map(5, 5)
 
         when:
-        map.move(new Point(0, 0), new Step(10, 0))
+        map.move(new Point(0, 0), new Movement(10, 0))
 
         then:
         IllegalArgumentException ex = thrown()

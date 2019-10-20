@@ -18,10 +18,10 @@ data class Area(val width: Int, val height: Int) {
 
 }
 
-class Step(val x: Int, val y: Int) {
+class Movement(val xShift: Int, val yShift: Int) {
 
-    fun invert() : Step {
-        return Step(x * -1 , y * -1)
+    fun invert() : Movement {
+        return Movement(xShift * -1 , yShift * -1)
     }
 }
 
@@ -41,8 +41,8 @@ class Map(width: Int = 10, height: Int = 10) {
                 .toSet()
     }
 
-    fun move(from: Point, step: Step) : Point {
-        val newPosition = Point(from.x + step.x, from.y + step.y)
+    fun move(from: Point, movement: Movement) : Point {
+        val newPosition = Point(from.x + movement.xShift, from.y + movement.yShift)
         if (!isInside(newPosition))
             throw IllegalArgumentException("New position is outside map")
         return newPosition

@@ -17,28 +17,28 @@ enum class Direction(val literal: String) : ClockOrdered {
     N("NORTH") {
         override fun clockwise(): Direction = E
         override fun antiClockwise(): Direction = W
-        override fun unitMovement(): Step = Step(0, 1)
+        override fun unitMovement(): Movement = Movement(0, 1)
     },
 
     E("EAST")  {
         override fun clockwise(): Direction = S
         override fun antiClockwise(): Direction = N
-        override fun unitMovement(): Step = Step(1, 0)
+        override fun unitMovement(): Movement = Movement(1, 0)
     },
 
     S("SOUTH") {
         override fun clockwise(): Direction = W
         override fun antiClockwise(): Direction = E
-        override fun unitMovement(): Step = Step(0, -1)
+        override fun unitMovement(): Movement = Movement(0, -1)
     },
 
     W("WEST") {
         override fun clockwise(): Direction = N
         override fun antiClockwise(): Direction = S
-        override fun unitMovement(): Step = Step(-1, 0)
+        override fun unitMovement(): Movement = Movement(-1, 0)
     };
 
-    abstract fun unitMovement(): Step
+    abstract fun unitMovement(): Movement
 
 }
 
