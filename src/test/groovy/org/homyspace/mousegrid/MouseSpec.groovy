@@ -11,7 +11,7 @@ class MouseSpec extends Specification {
 
         given:
         def initialMap = new Map()
-        def initialPosition = new Point(2, 2)
+        def initialPosition = new PositivePoint(2, 2)
         def initialDirection = Direction.@N
 
         when:
@@ -26,7 +26,7 @@ class MouseSpec extends Specification {
 
         given:
         def initialMap = new Map(10, 10)
-        def initialPosition = new Point(20, 20)
+        def initialPosition = new PositivePoint(20, 20)
         def initialDirection = Direction.@N
 
         when:
@@ -74,7 +74,7 @@ class MouseSpec extends Specification {
     }
 
     @Unroll
-    def 'should obey move commands "#commands"'() {
+    def 'carry on move commands "#commands"'() {
 
         given:
         Mouse mouse = new Mouse()
@@ -87,23 +87,23 @@ class MouseSpec extends Specification {
         mouse.broadcastDirection() == direction
 
         where:
-        commands | position        | direction
-        "FFFB"   | new Point(0, 2) | Direction.@N
-        "FFBB"   | new Point(0, 0) | Direction.@N
+        commands | position                | direction
+        "FFFB"   | new PositivePoint(0, 2) | Direction.@N
+        "FFBB"   | new PositivePoint(0, 0) | Direction.@N
 
     }
 
     @Unroll
-    def 'on turn commands "#commands", then new direction "#newDirection"'() {
+    def 'carry on turn commands "#commands", then new direction "#newDirection"'() {
 
         given:
-        Mouse mouse = new Mouse(new Map(), new Point(0, 0), Direction.@N)
+        Mouse mouse = new Mouse(new Map(), new PositivePoint(0, 0), Direction.@N)
 
         when:
         mouse = mouse.executeCommands(commands)
 
         then:
-        mouse.broadcastPosition() == new Point(0, 0)
+        mouse.broadcastPosition() == new PositivePoint(0, 0)
         mouse.broadcastDirection() == newDirection
 
         where:
@@ -118,7 +118,7 @@ class MouseSpec extends Specification {
     }
 
     @Unroll
-    def 'mix movement and turn commands "#commands"'() {
+    def 'carry on a mix of movement and turn commands "#commands"'() {
 
         given:
         Mouse mouse = new Mouse()
@@ -131,9 +131,9 @@ class MouseSpec extends Specification {
         mouse.broadcastDirection() == newDirection
 
         where:
-        commands  | newPosition     | newDirection
-        "FRFR"    | new Point(1, 1) | Direction.@S
-        "RFFFLFF" | new Point(3, 2) | Direction.@N
+        commands  | newPosition             | newDirection
+        "FRFR"    | new PositivePoint(1, 1) | Direction.@S
+        "RFFFLFF" | new PositivePoint(3, 2) | Direction.@N
 
     }
 

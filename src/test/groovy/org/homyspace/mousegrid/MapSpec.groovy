@@ -4,43 +4,15 @@ import spock.lang.Specification
 
 class MapSpec extends Specification {
 
-    def 'can be created width valid dimensions'() {
+    def 'has a default size of (10, 10)'() {
         when:
-        Map map = new Map(5, 10)
+        Map map = new Map()
 
         then:
-        map.area.width == 5
-        map.area.height == 10
+        map.area == new Area(10, 10)
     }
 
-    def 'complains when created with invalid dimensions'() {
-        when:
-        new Map(-5, 10)
-
-        then:
-        IllegalArgumentException ex = thrown()
-        ex.message == "'width' should be greater or equal than 0"
-    }
-
-    def 'point is inside map'() {
-        when:
-        Map map = new Map(2, 2)
-        Point point = new Point(0, 0)
-
-        then:
-        map.isInside(point) == true
-    }
-
-    def 'point is outside map'() {
-        when:
-        def map = new Map(2, 2)
-        def point = new Point(3, 0)
-
-        then:
-        map.isInside(point) == false
-    }
-
-    def 'should return its size'() {
+    def 'can provide its size'() {
         given:
         Map map = new Map(5, 10)
 
@@ -51,7 +23,7 @@ class MapSpec extends Specification {
         mapArea == new Area(5, 10)
     }
 
-    def 'can provide obstacles inside map'() {
+    def 'can provide obstacles inside'() {
         given:
         Map map = new Map(10, 10, new Obstacle(0, 0), new Obstacle(2, 3))
 
@@ -62,7 +34,7 @@ class MapSpec extends Specification {
         obstacles.size() == 2
     }
 
-    def 'obstacles outside map are ignored'() {
+    def 'obstacles outside are ignored'() {
         given:
         Map map = new Map(5, 10, new Obstacle(10, 10), new Obstacle(2, 3))
 
@@ -78,7 +50,7 @@ class MapSpec extends Specification {
         Map map = new Map(5, 5)
 
         when:
-        map.move(new Point(0, 0), new Movement(10, 0))
+        map.move(new PositivePoint(0, 0), new Movement(10, 0))
 
         then:
         IllegalArgumentException ex = thrown()
