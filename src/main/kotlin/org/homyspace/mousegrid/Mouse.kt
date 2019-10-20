@@ -44,14 +44,14 @@ enum class Direction(val literal: String) : ClockOrdered {
 
 class Mouse(
         private val map: Map = Map(),
-        private val position: Point = Point(),
+        private val position: PositivePoint = PositivePoint(),
         private val direction: Direction = Direction.N) {
 
     init {
         require(map.isInside(position)) { "mouse 'position' should be inside map" }
     }
 
-    fun broadcastPosition() : Point {
+    fun broadcastPosition() : PositivePoint {
         return position
     }
 

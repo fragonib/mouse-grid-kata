@@ -3,7 +3,12 @@ package org.homyspace.mousegrid
 import java.lang.IllegalArgumentException
 import java.util.*
 
-data class Point(val x: Int = 0, val y: Int = 0)
+data class PositivePoint(val x: Int = 0, val y: Int = 0) {
+    init {
+        require(x >= 0) { "'x' should be greater or equal than 0" }
+        require(y >= 0) { "'y' should be greater or equal than 0" }
+    }
+}
 
 data class Area(val width: Int, val height: Int) {
 
@@ -12,8 +17,8 @@ data class Area(val width: Int, val height: Int) {
         require(height > 0) { "'height' should be greater or equal than 0" }
     }
 
-    fun isInside(point: Point): Boolean {
-        return point.x < this.width && point.y < this.height
+    fun isInside(point: PositivePoint): Boolean {
+        return point.x <= this.width && point.y <= this.height
     }
 
 }
@@ -26,7 +31,7 @@ class Movement(val xShift: Int, val yShift: Int) {
 }
 
 class Obstacle(x: Int, y: Int) {
-    val position: Point = Point(x, y)
+    val position: PositivePoint = PositivePoint(x, y)
 }
 
 class Map(width: Int = 10, height: Int = 10) {
@@ -41,13 +46,13 @@ class Map(width: Int = 10, height: Int = 10) {
                 .toSet()
     }
 
-    fun move(from: Point, movement: Movement) : Point {
-        val newPosition = Point(from.x + movement.xShift, from.y + movement.yShift)
+    fun move(from: PositivePoint, movement: Movement) : PositivePoint {
+        val newPosition = PositivePoint(from.x + movement.xShift, from.y + movement.yShift)
         if (!isInside(newPosition))
             throw IllegalArgumentException("New position is outside map")
         return newPosition
     }
 
-    fun isInside(point: Point): Boolean = area.isInside(point)
+    fun isInside(point: PositivePoint): Boolean = area.isInside(point)
 
 }
