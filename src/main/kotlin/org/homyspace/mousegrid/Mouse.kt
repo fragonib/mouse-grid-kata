@@ -3,29 +3,29 @@
  */
 package org.homyspace.mousegrid
 
-class Mouse(
+open class Mouse(
         private val grid: Grid = Grid(),
-        private val position: PositivePoint = PositivePoint(),
-        private val direction: Direction = Direction.N) {
+        private val currentPosition: PositivePoint = PositivePoint(),
+        private val currentDirection: Direction = Direction.N) {
 
     init {
-        require(grid.containsPoint(position)) {
+        require(grid.containsPoint(currentPosition)) {
             "mouse 'position' should be inside map"
         }
-        require(grid.isObstacleOn(position).isEmpty()) {
+        require(grid.isObstacleOn(currentPosition).isEmpty()) {
             "mouse 'position' should NOT be inside an obstacle"
         }
     }
-
+    
     fun broadcastPosition() : PositivePoint {
-        return position
+        return currentPosition
     }
 
     fun broadcastDirection() : Direction {
-        return direction
+        return currentDirection
     }
 
-    fun receiveCommands(commands: String) : List<MouseAction> {
+    fun receiveCommands(commands: String) : List<Command> {
         return commands.toCharArray()
                 .map { readCommand(it) }
     }
@@ -35,25 +35,39 @@ class Mouse(
                 .fold(this, { mouse, command -> mouse.doCommand(command)} )
     }
 
-    private fun readCommand(commandChar: Char) : MouseAction {
-        return Command.valueOf(commandChar.toString()).mouseAction
+    private fun readCommand(commandChar: Char) : Command {
+        return Command.valueOf(commandChar.toString())
     }
 
-    private fun doCommand(command: MouseAction): Mouse {
-        return when (command) {
+    private fun doCommand(command: Command): Mouse {
+        
+        return when (val mouseAction = command.mouseAction) {
+
             is MouseAction.MovementAction -> {
-                val newPosition = command.move(grid, position, direction)
-                        .mapLeft { obstacle -> position }
-                        .fold({ position }, { it })
-                Mouse(grid, newPosition, direction)
+                mouseAction.move(grid, currentPosition, currentDirection)
+                        .fold({ 
+                            BlockedMouse(grid, currentPosition, currentDirection, it) 
+                        }, { 
+                            Mouse(grid, it, currentDirection) 
+                        })
             }
+
             is MouseAction.TurningAction -> {
-                val newDirection = command.turn(direction)
-                Mouse(grid, position, newDirection)
+                val newDirection = mouseAction.turn(currentDirection)
+                Mouse(grid, currentPosition, newDirection)
             }
+
         }
     }
 
 }
+
+class BlockedMouse(
+        private val grid: Grid,
+        private val currentPosition: PositivePoint,
+        private val currentDirection: Direction,
+        val blockingObstacle: Obstacle) : Mouse(grid, currentPosition, currentDirection) {
+    
+} 
 
 

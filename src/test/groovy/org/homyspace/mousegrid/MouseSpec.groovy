@@ -62,8 +62,8 @@ class MouseSpec extends Specification {
         where:
         commands | commandsRead
         ""       | [ ]
-        "FB"     | [ MoveForward.INSTANCE, MoveBackwards.INSTANCE ]
-        "LR"     | [ TurnLeft.INSTANCE, TurnRight.INSTANCE ]
+        "FB"     | [ Command.F, Command.B ]
+        "LR"     | [ Command.L, Command.R ]
     }
 
     @Unroll
@@ -157,10 +157,11 @@ class MouseSpec extends Specification {
     }
 
     @Unroll
-    def 'carry on commands "#commands" with an obstacle on its way'() {
+    def 'carry on commands "#commands" when obstacles on grid'() {
 
         given:
-        Grid initialMap = new Grid(5, 5, new Obstacle(2, 3))
+        def obstacle = new Obstacle(2, 3)
+        def initialMap = new Grid(5, 5, obstacle)
         def initialPosition = new PositivePoint()
         def initialDirection = Direction.@N
         Mouse mouse = new Mouse(initialMap, initialPosition, initialDirection)
@@ -169,14 +170,17 @@ class MouseSpec extends Specification {
         mouse = mouse.executeCommands(commands)
 
         then:
+        expectedClass.isCase(mouse)
         mouse.broadcastPosition() == expectedPosition
         mouse.broadcastDirection() == expectedDirection
+        if (mouse instanceof BlockedMouse)
+            ((BlockedMouse) mouse).getBlockingObstacle() == obstacle
 
         where:
-        commands  | expectedPosition        | expectedDirection
-        "FRFR"    | new PositivePoint(1, 1) | Direction.@S
-        "RFFLFFF" | new PositivePoint(2, 2) | Direction.@N
-        "FFFRFF"  | new PositivePoint(1, 3) | Direction.@E
+        commands  | expectedPosition        | expectedDirection | expectedClass
+        "FRFR"    | new PositivePoint(1, 1) | Direction.@S      | Mouse
+        "RFFLFFF" | new PositivePoint(2, 2) | Direction.@N      | BlockedMouse
+        "FFFRFF"  | new PositivePoint(1, 3) | Direction.@E      | BlockedMouse
 
     }
 
