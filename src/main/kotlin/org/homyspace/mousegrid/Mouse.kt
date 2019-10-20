@@ -48,7 +48,7 @@ class Mouse(
         private val direction: Direction = Direction.N) {
 
     init {
-        require(map.isInside(position)) { "mouse 'position' should be inside map" }
+        require(map.area.isInside(position)) { "mouse 'position' should be inside map" }
     }
 
     fun broadcastPosition() : PositivePoint {
