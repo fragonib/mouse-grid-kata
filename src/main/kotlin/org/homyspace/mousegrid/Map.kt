@@ -3,32 +3,42 @@ package org.homyspace.mousegrid
 import java.lang.IllegalArgumentException
 import java.util.*
 
-class Obstacle(x: Int, y: Int) {
-    val position: Point = Point(x, y)
+data class Point(val x: Int = 0, val y: Int = 0)
+
+data class Area(val width: Int, val height: Int) {
+
+    init {
+        require(width > 0) { "'width' should be greater or equal than 0" }
+        require(height > 0) { "'height' should be greater or equal than 0" }
+    }
+
+    fun isInside(point: Point): Boolean {
+        return point.x < this.width && point.y < this.height
+    }
+
 }
 
 class Step(val x: Int, val y: Int) {
+
     fun invert() : Step {
         return Step(x * -1 , y * -1)
     }
 }
 
-class Map(private val area: Area = Area(10, 10)) {
+class Obstacle(x: Int, y: Int) {
+    val position: Point = Point(x, y)
+}
 
-    private var obstacles: Set<Obstacle>
+class Map(width: Int = 10, height: Int = 10) {
 
-    init {
-        this.obstacles = Collections.emptySet()
-    }
+    private val area: Area = Area(width, height)
+    private var obstacles: Set<Obstacle> = Collections.emptySet()
 
-    constructor(area: Area, vararg obstacles: Obstacle) : this(area) {
+    constructor(width: Int = 10, height: Int = 10, vararg obstacles: Obstacle) :
+            this(width, height) {
         this.obstacles = obstacles
                 .filter { area.isInside(it.position) }
                 .toSet()
-    }
-
-    fun size() : Area {
-        return this.area
     }
 
     fun move(from: Point, step: Step) : Point {

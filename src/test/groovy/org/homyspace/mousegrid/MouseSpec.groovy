@@ -25,7 +25,7 @@ class MouseSpec extends Specification {
     def 'complains if is NOT inside a map'() {
 
         given:
-        def initialMap = new Map(new Area(10, 10))
+        def initialMap = new Map(10, 10)
         def initialPosition = new Point(20, 20)
         def initialDirection = Direction.N
 
