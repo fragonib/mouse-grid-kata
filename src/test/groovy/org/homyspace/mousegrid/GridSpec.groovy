@@ -2,11 +2,11 @@ package org.homyspace.mousegrid
 
 import spock.lang.Specification
 
-class MapSpec extends Specification {
+class GridSpec extends Specification {
 
     def 'has a default size of (10, 10)'() {
         when:
-        Map map = new Map()
+        Grid map = new Grid()
 
         then:
         map.area == new Area(10, 10)
@@ -14,7 +14,7 @@ class MapSpec extends Specification {
 
     def 'can provide its size'() {
         given:
-        Map map = new Map(5, 10)
+        Grid map = new Grid(5, 10)
 
         when:
         Area mapArea = map.area
@@ -25,7 +25,7 @@ class MapSpec extends Specification {
 
     def 'can provide obstacles inside'() {
         given:
-        Map map = new Map(10, 10, new Obstacle(0, 0), new Obstacle(2, 3))
+        Grid map = new Grid(10, 10, new Obstacle(0, 0), new Obstacle(2, 3))
 
         when:
         Set<Obstacle> obstacles = map.obstacles
@@ -36,7 +36,7 @@ class MapSpec extends Specification {
 
     def 'obstacles outside are ignored'() {
         given:
-        Map map = new Map(5, 10, new Obstacle(10, 10), new Obstacle(2, 3))
+        Grid map = new Grid(5, 10, new Obstacle(10, 10), new Obstacle(2, 3))
 
         when:
         Set<Obstacle> obstacles = map.obstacles
@@ -47,7 +47,7 @@ class MapSpec extends Specification {
 
     def 'moves within the map'() {
         given:
-        Map map = new Map(10, 10)
+        Grid map = new Grid(10, 10)
 
         when:
         def from = new PositivePoint(fromX, fromY)
@@ -66,7 +66,7 @@ class MapSpec extends Specification {
 
     def 'wraps movement across edges'() {
         given:
-        Map map = new Map(10, 10)
+        Grid map = new Grid(10, 10)
 
         when:
         def from = new PositivePoint(fromX, fromY)

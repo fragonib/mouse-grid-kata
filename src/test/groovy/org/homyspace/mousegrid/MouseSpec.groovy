@@ -10,7 +10,7 @@ class MouseSpec extends Specification {
     def 'has an initial position and direction'() {
 
         given:
-        def initialMap = new Map()
+        def initialMap = new Grid()
         def initialPosition = new PositivePoint(2, 2)
         def initialDirection = Direction.@N
 
@@ -25,7 +25,7 @@ class MouseSpec extends Specification {
     def 'complains if is NOT inside a map'() {
 
         given:
-        def initialMap = new Map(10, 10)
+        def initialMap = new Grid(10, 10)
         def initialPosition = new PositivePoint(20, 20)
         def initialDirection = Direction.@N
 
@@ -96,7 +96,7 @@ class MouseSpec extends Specification {
     def 'carry on turn commands "#commands", then new direction "#newDirection"'() {
 
         given:
-        Mouse mouse = new Mouse(new Map(), new PositivePoint(0, 0), Direction.@N)
+        Mouse mouse = new Mouse(new Grid(), new PositivePoint(0, 0), Direction.@N)
 
         when:
         mouse = mouse.executeCommands(commands)
@@ -120,7 +120,7 @@ class MouseSpec extends Specification {
     def 'carry on a mix of movement and turn commands "#commands"'() {
 
         given:
-        Map initialMap = new Map(5, 5)
+        Grid initialMap = new Grid(5, 5)
         def initialPosition = new PositivePoint()
         def initialDirection = Direction.@N
         Mouse mouse = new Mouse(initialMap, initialPosition, initialDirection)

@@ -1,3 +1,6 @@
+/*
+ * It's responsible for defining mouse and commands
+ */
 package org.homyspace.mousegrid
 
 enum class Command(val literal: String) {
@@ -7,48 +10,14 @@ enum class Command(val literal: String) {
     R("RIGHT")
 }
 
-interface ClockOrdered {
-    fun clockwise() : Direction
-    fun antiClockwise() : Direction
-}
-
-enum class Direction(val literal: String) : ClockOrdered {
-
-    N("NORTH") {
-        override fun clockwise(): Direction = E
-        override fun antiClockwise(): Direction = W
-        override fun unitMovement(): Movement = Movement(0, 1)
-    },
-
-    E("EAST")  {
-        override fun clockwise(): Direction = S
-        override fun antiClockwise(): Direction = N
-        override fun unitMovement(): Movement = Movement(1, 0)
-    },
-
-    S("SOUTH") {
-        override fun clockwise(): Direction = W
-        override fun antiClockwise(): Direction = E
-        override fun unitMovement(): Movement = Movement(0, -1)
-    },
-
-    W("WEST") {
-        override fun clockwise(): Direction = N
-        override fun antiClockwise(): Direction = S
-        override fun unitMovement(): Movement = Movement(-1, 0)
-    };
-
-    abstract fun unitMovement(): Movement
-
-}
-
 class Mouse(
-        private val map: Map = Map(),
+        private val grid: Grid = Grid(),
         private val position: PositivePoint = PositivePoint(),
         private val direction: Direction = Direction.N) {
 
     init {
-        require(map.area.isInside(position)) { "mouse 'position' should be inside map" }
+        val isMouseInsideGrid = grid.area.isInside(position)
+        require(isMouseInsideGrid) { "mouse 'position' should be inside map" }
     }
 
     fun broadcastPosition() : PositivePoint {
@@ -72,10 +41,10 @@ class Mouse(
 
     private fun doCommand(command: Command): Mouse {
         return when (command) {
-            Command.F -> Mouse(map, map.move(position, direction.unitMovement()), direction)
-            Command.B -> Mouse(map, map.move(position, direction.unitMovement().invert()), direction)
-            Command.L -> Mouse(map, position, direction.antiClockwise())
-            Command.R -> Mouse(map, position, direction.clockwise())
+            Command.F -> Mouse(grid, grid.move(position, direction.unitMovement()), direction)
+            Command.B -> Mouse(grid, grid.move(position, direction.unitMovement().invert()), direction)
+            Command.L -> Mouse(grid, position, direction.nextCounterClockwise())
+            Command.R -> Mouse(grid, position, direction.nextClockwise())
         }
     }
 
