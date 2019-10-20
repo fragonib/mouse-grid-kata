@@ -45,16 +45,42 @@ class MapSpec extends Specification {
         obstacles.size() == 1
     }
 
-    def 'complains if movement is outside map'() {
+    def 'moves within the map'() {
         given:
-        Map map = new Map(5, 5)
+        Map map = new Map(10, 10)
 
         when:
-        map.move(new PositivePoint(0, 0), new Movement(10, 0))
+        def from = new PositivePoint(fromX, fromY)
+        def movement = new Movement(shiftX, shiftX)
+        def newPosition = map.move(from, movement)
 
         then:
-        IllegalArgumentException ex = thrown()
-        ex.message == 'New position is outside map'
+        newPosition == new PositivePoint(expectedX, expectedY)
+
+        where:
+        fromX | fromY | shiftX | shiftY | expectedX | expectedY
+        0     | 0     | 0      | 0      | 0         | 0
+        0     | 0     | 5      | 5      | 5         | 5
+        0     | 0     | 9      | 9      | 9         | 9
+    }
+
+    def 'wraps movement across edges'() {
+        given:
+        Map map = new Map(10, 10)
+
+        when:
+        def from = new PositivePoint(fromX, fromY)
+        def movement = new Movement(shiftX, shiftX)
+        def newPosition = map.move(from, movement)
+
+        then:
+        newPosition == new PositivePoint(expectedX, expectedY)
+
+        where:
+        fromX | fromY | shiftX | shiftY | expectedX | expectedY
+        0     | 0     | 10     | 10     | 0         | 0
+        0     | 0     | -1     | -1     | 9         | 9
+        0     | 0     | 25     | 25     | 5         | 5
     }
 
 }

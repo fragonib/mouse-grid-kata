@@ -90,7 +90,6 @@ class MouseSpec extends Specification {
         commands | position                | direction
         "FFFB"   | new PositivePoint(0, 2) | Direction.@N
         "FFBB"   | new PositivePoint(0, 0) | Direction.@N
-
     }
 
     @Unroll
@@ -121,19 +120,26 @@ class MouseSpec extends Specification {
     def 'carry on a mix of movement and turn commands "#commands"'() {
 
         given:
-        Mouse mouse = new Mouse()
+        Map initialMap = new Map(5, 5)
+        def initialPosition = new PositivePoint()
+        def initialDirection = Direction.@N
+        Mouse mouse = new Mouse(initialMap, initialPosition, initialDirection)
 
         when:
         mouse = mouse.executeCommands(commands)
 
         then:
-        mouse.broadcastPosition() == newPosition
-        mouse.broadcastDirection() == newDirection
+        mouse.broadcastPosition() == expectedPosition
+        mouse.broadcastDirection() == expectedDirection
 
         where:
-        commands  | newPosition             | newDirection
+        commands  | expectedPosition        | expectedDirection
         "FRFR"    | new PositivePoint(1, 1) | Direction.@S
         "RFFFLFF" | new PositivePoint(3, 2) | Direction.@N
+        "RFFFLFF" | new PositivePoint(3, 2) | Direction.@N
+        "RFFFLFF" | new PositivePoint(3, 2) | Direction.@N
+        "FFFFF"   | new PositivePoint(0, 0) | Direction.@N
+        "LFF"     | new PositivePoint(3, 0) | Direction.@W
 
     }
 

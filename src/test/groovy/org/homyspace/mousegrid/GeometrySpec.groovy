@@ -22,8 +22,8 @@ class GeometrySpec extends Specification {
 
         where:
         x  | y   | expectedMessage
-        -1 | 0   | "'x' should be greater or equal than 0"
-        10 | -10 | "'y' should be greater or equal than 0"
+        -1 | 0   | "'x=-1' and should be greater or equal than 0"
+        10 | -10 | "'y=-10' and should be greater or equal than 0"
     }
     
     def 'area can be created width valid dimensions'() {
@@ -52,11 +52,11 @@ class GeometrySpec extends Specification {
 
         where:
         width | height | expectedMessage
-        0     | 0      | "'width' should be greater or equal than 0"
-        0     | 10     | "'width' should be greater or equal than 0"
-        10    | 0      | "'height' should be greater or equal than 0"
-        -1    | 10     | "'width' should be greater or equal than 0"
-        10    | -1     | "'height' should be greater or equal than 0"
+        0     | 0      | "'width=0' and should be greater than 0"
+        0     | 10     | "'width=0' and should be greater than 0"
+        10    | 0      | "'height=0' and should be greater than 0"
+        -1    | 10     | "'width=-1' and should be greater than 0"
+        10    | -1     | "'height=-1' and should be greater than 0"
     }
 
     def 'area determines when a point is inside or outside'() {

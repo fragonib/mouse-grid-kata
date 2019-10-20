@@ -1,20 +1,19 @@
 package org.homyspace.mousegrid
 
-import java.lang.IllegalArgumentException
 import java.util.*
 
 data class PositivePoint(val x: Int = 0, val y: Int = 0) {
     init {
-        require(x >= 0) { "'x' should be greater or equal than 0" }
-        require(y >= 0) { "'y' should be greater or equal than 0" }
+        require(x >= 0) { "'x=$x' and should be greater or equal than 0" }
+        require(y >= 0) { "'y=$y' and should be greater or equal than 0" }
     }
 }
 
 data class Area(val width: Int, val height: Int) {
 
     init {
-        require(width > 0) { "'width' should be greater or equal than 0" }
-        require(height > 0) { "'height' should be greater or equal than 0" }
+        require(width > 0) { "'width=$width' and should be greater than 0" }
+        require(height > 0) { "'height=$height' and should be greater than 0" }
     }
 
     fun isInside(point: PositivePoint): Boolean {
@@ -36,8 +35,8 @@ class Obstacle(x: Int, y: Int) {
 
 class Map(width: Int = 10, height: Int = 10) {
 
-    private val area: Area = Area(width, height)
-    private var obstacles: Set<Obstacle> = Collections.emptySet()
+    val area: Area = Area(width, height)
+    var obstacles: Set<Obstacle> = Collections.emptySet()
 
     constructor(width: Int = 10, height: Int = 10, vararg obstacles: Obstacle) :
             this(width, height) {
@@ -47,12 +46,14 @@ class Map(width: Int = 10, height: Int = 10) {
     }
 
     fun move(from: PositivePoint, movement: Movement) : PositivePoint {
-        val newPosition = PositivePoint(from.x + movement.xShift, from.y + movement.yShift)
-        if (!isInside(newPosition))
-            throw IllegalArgumentException("New position is outside map")
-        return newPosition
+        val newX = wrap(from.x + movement.xShift, area.width)
+        val newY = wrap(from.y + movement.yShift, area.height)
+        return PositivePoint(newX, newY)
     }
 
-    fun isInside(point: PositivePoint): Boolean = area.isInside(point)
+    private fun wrap(value: Int, max: Int): Int {
+        val wrappedValue = value % max
+        return if (wrappedValue < 0) wrappedValue + max else wrappedValue
+    }
 
 }
