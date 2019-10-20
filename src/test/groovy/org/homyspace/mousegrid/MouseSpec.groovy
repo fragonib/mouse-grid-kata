@@ -12,7 +12,7 @@ class MouseSpec extends Specification {
         given:
         def initialMap = new Map()
         def initialPosition = new Point(2, 2)
-        def initialDirection = Direction.N
+        def initialDirection = Direction.W
 
         when:
         Mouse mouse = new Mouse(initialMap, initialPosition, initialDirection)
@@ -22,7 +22,7 @@ class MouseSpec extends Specification {
         mouse.broadcastDirection() == initialDirection
     }
 
-    def 'is inside a map'() {
+    def 'complains if is NOT inside a map'() {
 
         given:
         def initialMap = new Map(new Area(10, 10))
@@ -74,25 +74,67 @@ class MouseSpec extends Specification {
     }
 
     @Unroll
-    def 'implement move commands "#commands"'() {
+    def 'should obey move commands "#commands"'() {
 
         given:
         Mouse mouse = new Mouse()
 
         when:
-        def newRover = mouse.executeCommands(commands)
+        def rover = mouse.executeCommands(commands)
 
         then:
-        newRover.broadcastPosition() == position
-        newRover.broadcastDirection() == direction
+        rover.broadcastPosition() == position
+        rover.broadcastDirection() == direction
 
         where:
         commands | position        | direction
-        ""       | new Point(0, 0) | Direction.N
         "FFFB"   | new Point(0, 2) | Direction.N
         "FFBB"   | new Point(0, 0) | Direction.N
 
     }
 
+    @Unroll
+    def 'on turn commands "#commands", then new direction "#newDirection"'() {
+
+        given:
+        Mouse mouse = new Mouse(new Map(), new Point(0, 0), Direction.N)
+
+        when:
+        def rover = mouse.executeCommands(commands)
+
+        then:
+        rover.broadcastPosition() == new Point(0, 0)
+        rover.broadcastDirection() == newDirection
+
+        where:
+        commands | newDirection
+        "LL"     | Direction.S
+        "LR"     | Direction.N
+        "RL"     | Direction.N
+        "RR"     | Direction.S
+        "LLL"    | Direction.E
+        "RRR"    | Direction.W
+
+    }
+
+    @Unroll
+    def 'mix movement and turn commands "#commands"'() {
+
+        given:
+        Mouse mouse = new Mouse()
+
+        when:
+        def rover = mouse.executeCommands(commands)
+
+        then:
+        rover.broadcastPosition() == position
+        rover.broadcastDirection() == direction
+
+        where:
+        commands  | position        | direction
+        "FRFR"    | new Point(1, 1) | Direction.S
+        "RFFFLFF" | new Point(3, 2) | Direction.N
+
+    }
 
 }
