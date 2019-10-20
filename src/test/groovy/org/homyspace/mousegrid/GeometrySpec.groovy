@@ -65,7 +65,7 @@ class GeometrySpec extends Specification {
         def point = new PositivePoint(x, y)
 
         expect:
-        area.isInside(point) == expectedInsideness
+        area.contains(point) == expectedInsideness
 
         where:
         x  | y  | expectedInsideness

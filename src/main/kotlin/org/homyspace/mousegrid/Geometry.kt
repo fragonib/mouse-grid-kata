@@ -17,7 +17,7 @@ data class Area(val width: Int, val height: Int) {
         require(height > 0) { "'height=$height' and should be greater than 0" }
     }
 
-    fun isInside(point: PositivePoint): Boolean {
+    fun contains(point: PositivePoint): Boolean {
         return point.x <= this.width && point.y <= this.height
     }
 
