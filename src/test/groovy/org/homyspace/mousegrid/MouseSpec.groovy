@@ -37,6 +37,21 @@ class MouseSpec extends Specification {
         error.message.contains("mouse 'position' should be inside map")
     }
 
+    def 'complains if is inside an obstacle'() {
+
+        given:
+        def initialMap = new Grid(10, 10, new Obstacle(2, 4))
+        def initialPosition = new PositivePoint(2, 4)
+        def initialDirection = Direction.@N
+
+        when:
+        new Mouse(initialMap, initialPosition, initialDirection)
+
+        then:
+        def error = thrown(IllegalArgumentException)
+        error.message.contains("mouse 'position' should NOT be inside an obstacle")
+    }
+
     @Unroll
     def 'receive valid commands "#commands"'() {
 
@@ -140,6 +155,30 @@ class MouseSpec extends Specification {
         "RFFFLFF" | new PositivePoint(3, 2) | Direction.@N
         "FFFFF"   | new PositivePoint(0, 0) | Direction.@N
         "LFF"     | new PositivePoint(3, 0) | Direction.@W
+
+    }
+
+    @Unroll
+    def 'carry on commands "#commands" with an obstacle on its way'() {
+
+        given:
+        Grid initialMap = new Grid(5, 5, new Obstacle(2, 3))
+        def initialPosition = new PositivePoint()
+        def initialDirection = Direction.@N
+        Mouse mouse = new Mouse(initialMap, initialPosition, initialDirection)
+
+        when:
+        mouse = mouse.executeCommands(commands)
+
+        then:
+        mouse.broadcastPosition() == expectedPosition
+        mouse.broadcastDirection() == expectedDirection
+
+        where:
+        commands  | expectedPosition        | expectedDirection
+        "FRFR"    | new PositivePoint(1, 1) | Direction.@S
+        "RFFLFFF" | new PositivePoint(2, 2) | Direction.@N
+        "FFFRFF"  | new PositivePoint(1, 3) | Direction.@E
 
     }
 

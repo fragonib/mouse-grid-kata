@@ -6,53 +6,97 @@ class GridSpec extends Specification {
 
     def 'has a default size of (10, 10)'() {
         when:
-        Grid map = new Grid()
+        Grid grid = new Grid()
 
         then:
-        map.area == new Area(10, 10)
+        grid.area == new Area(10, 10)
     }
 
     def 'can provide its size'() {
         given:
-        Grid map = new Grid(5, 10)
+        Grid grid = new Grid(5, 10)
 
         when:
-        Area mapArea = map.area
+        Area gridArea = grid.area
 
         then:
-        mapArea == new Area(5, 10)
+        gridArea == new Area(5, 10)
     }
 
-    def 'can provide obstacles inside'() {
+    def 'can provide obstacles inside grid'() {
         given:
-        Grid map = new Grid(10, 10, new Obstacle(0, 0), new Obstacle(2, 3))
+        def firstObstacle = new Obstacle(0, 0)
+        def secondObstacle = new Obstacle(2, 3)
+        Grid grid = new Grid(10, 10, firstObstacle, secondObstacle)
 
         when:
-        Set<Obstacle> obstacles = map.obstacles
+        Set<Obstacle> obstacles = grid.obstacles
 
         then:
         obstacles.size() == 2
     }
 
-    def 'obstacles outside are ignored'() {
+    def 'obstacles outside grid are ignored'() {
         given:
-        Grid map = new Grid(5, 10, new Obstacle(10, 10), new Obstacle(2, 3))
+        def insideObstacle = new Obstacle(5, 5)
+        def outsideObstacle = new Obstacle(10, 10)
+        Grid grid = new Grid(5, 10, outsideObstacle, insideObstacle)
 
         when:
-        Set<Obstacle> obstacles = map.obstacles
+        Set<Obstacle> obstacles = grid.obstacles
 
         then:
         obstacles.size() == 1
+        obstacles.contains(insideObstacle) == true
     }
 
-    def 'moves within the map'() {
+    def 'detects no obstacles on specific points'() {
         given:
-        Grid map = new Grid(10, 10)
+        def firstObstacle = new Obstacle(5, 5)
+        def secondObstacle = new Obstacle(2, 3)
+        Grid grid = new Grid(10, 10, firstObstacle, secondObstacle)
+
+        when:
+        def target = new PositivePoint(x, y)
+        def optionalObstacle = grid.isObstacleOn(target)
+
+        then:
+        optionalObstacle.isEmpty()
+
+        where:
+        x | y
+        0 | 0
+        2 | 2
+        5 | 6
+    }
+
+    def 'detects obstacles on specific points'() {
+        given:
+        def firstObstacle = new Obstacle(5, 5)
+        def secondObstacle = new Obstacle(2, 3)
+        Grid grid = new Grid(10, 10, firstObstacle, secondObstacle)
+
+        when:
+        def target = new PositivePoint(x, y)
+        def optionalObstacle = grid.isObstacleOn(target)
+
+        then:
+        optionalObstacle.isDefined()
+
+        where:
+        x | y
+        5 | 5
+        2 | 3
+    }
+
+    def 'does movements within the grid'() {
+        given:
+        Grid grid = new Grid(10, 10)
 
         when:
         def from = new PositivePoint(fromX, fromY)
         def movement = new Movement(shiftX, shiftX)
-        def newPosition = map.move(from, movement)
+        def newPosition = grid.move(from, movement).toOption().orNull()
 
         then:
         newPosition == new PositivePoint(expectedX, expectedY)
@@ -64,14 +108,14 @@ class GridSpec extends Specification {
         0     | 0     | 9      | 9      | 9         | 9
     }
 
-    def 'wraps movement across edges'() {
+    def 'wraps movements across grid edges'() {
         given:
-        Grid map = new Grid(10, 10)
+        Grid grid = new Grid(10, 10)
 
         when:
         def from = new PositivePoint(fromX, fromY)
         def movement = new Movement(shiftX, shiftX)
-        def newPosition = map.move(from, movement)
+        def newPosition = grid.move(from, movement).toOption().orNull()
 
         then:
         newPosition == new PositivePoint(expectedX, expectedY)

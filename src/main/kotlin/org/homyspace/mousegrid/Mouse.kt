@@ -16,8 +16,10 @@ class Mouse(
         private val direction: Direction = Direction.N) {
 
     init {
-        val isMouseInsideGrid = grid.area.isInside(position)
+        val isMouseInsideGrid = grid.containsPoint(position)
         require(isMouseInsideGrid) { "mouse 'position' should be inside map" }
+        val isMouseInsideObstacle = grid.isObstacleOn(position).isDefined()
+        require(!isMouseInsideObstacle) { "mouse 'position' should NOT be inside an obstacle" }
     }
 
     fun broadcastPosition() : PositivePoint {
@@ -41,12 +43,20 @@ class Mouse(
 
     private fun doCommand(command: Command): Mouse {
         return when (command) {
-            Command.F -> Mouse(grid, grid.move(position, direction.unitMovement()), direction)
-            Command.B -> Mouse(grid, grid.move(position, direction.unitMovement().invert()), direction)
-            Command.L -> Mouse(grid, position, direction.nextCounterClockwise())
-            Command.R -> Mouse(grid, position, direction.nextClockwise())
+            Command.F -> move(direction.unitMovement())
+            Command.B -> move(direction.unitMovement().invertWay())
+            Command.L -> turn(direction.nextCounterClockwise())
+            Command.R -> turn(direction.nextClockwise())
         }
     }
 
+    private fun move(movement: Movement) : Mouse {
+        return grid.move(position, movement)
+                .fold({ this }, { newPosition -> Mouse(grid, newPosition, direction) })
+    }
+
+    private fun turn(newDirection: Direction) = Mouse(grid, position, newDirection)
+
 }
+
 
