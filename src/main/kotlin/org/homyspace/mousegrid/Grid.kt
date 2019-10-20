@@ -7,9 +7,9 @@ import arrow.core.Either
 import arrow.core.Option
 import java.util.*
 
-class Movement(val xShift: Int, val yShift: Int) {
-    fun invertWay() : Movement {
-        return Movement(xShift * -1 , yShift * -1)
+class RelativeMovement(val xShift: Int, val yShift: Int) {
+    fun invertWay() : RelativeMovement {
+        return RelativeMovement(xShift * -1 , yShift * -1)
     }
 }
 
@@ -39,14 +39,14 @@ class Grid(width: Int = 10, height: Int = 10) {
         return Option.fromNullable(obstacles.find { it.isOccupying(targetPoint) })
     }
 
-    fun move(from: PositivePoint, movement: Movement) : Either<Obstacle, PositivePoint> {
+    fun move(from: PositivePoint, movement: RelativeMovement) : Either<Obstacle, PositivePoint> {
         val targetPoint = calculateNewPoint(from, movement)
         return isObstacleOn(targetPoint)
                 .toEither { targetPoint }
                 .swap()
     }
 
-    private fun calculateNewPoint(from: PositivePoint, movement: Movement): PositivePoint {
+    private fun calculateNewPoint(from: PositivePoint, movement: RelativeMovement): PositivePoint {
         val newX = wrapEdge(from.x + movement.xShift, area.width)
         val newY = wrapEdge(from.y + movement.yShift, area.height)
         return PositivePoint(newX, newY)

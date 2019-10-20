@@ -95,7 +95,7 @@ class GridSpec extends Specification {
 
         when:
         def from = new PositivePoint(fromX, fromY)
-        def movement = new Movement(shiftX, shiftX)
+        def movement = new RelativeMovement(shiftX, shiftX)
         def newPosition = grid.move(from, movement).toOption().orNull()
 
         then:
@@ -114,7 +114,7 @@ class GridSpec extends Specification {
 
         when:
         def from = new PositivePoint(fromX, fromY)
-        def movement = new Movement(shiftX, shiftX)
+        def movement = new RelativeMovement(shiftX, shiftX)
         def newPosition = grid.move(from, movement).toOption().orNull()
 
         then:
