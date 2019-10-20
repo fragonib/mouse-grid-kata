@@ -1,14 +1,7 @@
 /*
- * It's responsible for defining mouse and commands
+ * It's responsible for defining mouse operations
  */
 package org.homyspace.mousegrid
-
-enum class Command(val literal: String) {
-    F("FORWARD"),
-    B("BACKWARD"),
-    L("LEFT"),
-    R("RIGHT")
-}
 
 class Mouse(
         private val grid: Grid = Grid(),
@@ -16,10 +9,12 @@ class Mouse(
         private val direction: Direction = Direction.N) {
 
     init {
-        val isMouseInsideGrid = grid.containsPoint(position)
-        require(isMouseInsideGrid) { "mouse 'position' should be inside map" }
-        val isMouseInsideObstacle = grid.isObstacleOn(position).isDefined()
-        require(!isMouseInsideObstacle) { "mouse 'position' should NOT be inside an obstacle" }
+        require(grid.containsPoint(position)) {
+            "mouse 'position' should be inside map"
+        }
+        require(grid.isObstacleOn(position).isEmpty()) {
+            "mouse 'position' should NOT be inside an obstacle"
+        }
     }
 
     fun broadcastPosition() : PositivePoint {
@@ -30,32 +25,34 @@ class Mouse(
         return direction
     }
 
-    fun receiveCommands(commands: String) : List<Command> {
-        return commands.toCharArray().map { readCommand(it) }
+    fun receiveCommands(commands: String) : List<MouseAction> {
+        return commands.toCharArray()
+                .map { readCommand(it) }
     }
-
-    private fun readCommand(commandChar: Char) = Command.valueOf(commandChar.toString())
 
     fun executeCommands(commands: String) : Mouse {
         return receiveCommands(commands)
                 .fold(this, { mouse, command -> mouse.doCommand(command)} )
     }
 
-    private fun doCommand(command: Command): Mouse {
+    private fun readCommand(commandChar: Char) : MouseAction {
+        return Command.valueOf(commandChar.toString()).mouseAction
+    }
+
+    private fun doCommand(command: MouseAction): Mouse {
         return when (command) {
-            Command.F -> move(direction.unitMovement())
-            Command.B -> move(direction.unitMovement().invertWay())
-            Command.L -> turn(direction.nextCounterClockwise())
-            Command.R -> turn(direction.nextClockwise())
+            is MouseAction.MovementAction -> {
+                val newPosition = command.move(grid, position, direction)
+                        .mapLeft { obstacle -> position }
+                        .fold({ position }, { it })
+                Mouse(grid, newPosition, direction)
+            }
+            is MouseAction.TurningAction -> {
+                val newDirection = command.turn(direction)
+                Mouse(grid, position, newDirection)
+            }
         }
     }
-
-    private fun move(movement: Movement) : Mouse {
-        return grid.move(position, movement)
-                .fold({ this }, { newPosition -> Mouse(grid, newPosition, direction) })
-    }
-
-    private fun turn(newDirection: Direction) = Mouse(grid, position, newDirection)
 
 }
 

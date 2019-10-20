@@ -3,8 +3,6 @@ package org.homyspace.mousegrid
 import spock.lang.Specification
 import spock.lang.Unroll
 
-import static org.homyspace.mousegrid.Command.*
-
 class MouseSpec extends Specification {
 
     def 'has an initial position and direction'() {
@@ -64,8 +62,8 @@ class MouseSpec extends Specification {
         where:
         commands | commandsRead
         ""       | [ ]
-        "FBFB"   | [ F, B, F, B ]
-
+        "FB"     | [ MoveForward.INSTANCE, MoveBackwards.INSTANCE ]
+        "LR"     | [ TurnLeft.INSTANCE, TurnRight.INSTANCE ]
     }
 
     @Unroll
