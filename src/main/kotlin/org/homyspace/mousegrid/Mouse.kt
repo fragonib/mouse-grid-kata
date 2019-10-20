@@ -7,11 +7,39 @@ enum class Command(val literal: String) {
     R("RIGHT")
 }
 
-enum class Direction(val literal: String, val step: Step) {
-    N("NORTH", Step(0, 1)),
-    S("SOUTH", Step(0, -1)),
-    W("WEST",  Step(-1, 0)),
-    E("EAST",  Step(1, 0)),
+interface ClockOrdered {
+    fun clockwise() : Direction
+    fun antiClockwise() : Direction
+}
+
+enum class Direction(val literal: String) : ClockOrdered {
+
+    N("NORTH") {
+        override fun clockwise(): Direction = E
+        override fun antiClockwise(): Direction = W
+        override fun unitMovement(): Step = Step(0, 1)
+    },
+
+    E("EAST")  {
+        override fun clockwise(): Direction = S
+        override fun antiClockwise(): Direction = N
+        override fun unitMovement(): Step = Step(1, 0)
+    },
+
+    S("SOUTH") {
+        override fun clockwise(): Direction = W
+        override fun antiClockwise(): Direction = E
+        override fun unitMovement(): Step = Step(0, -1)
+    },
+
+    W("WEST") {
+        override fun clockwise(): Direction = N
+        override fun antiClockwise(): Direction = S
+        override fun unitMovement(): Step = Step(-1, 0)
+    };
+
+    abstract fun unitMovement(): Step
+
 }
 
 class Mouse(
@@ -35,7 +63,7 @@ class Mouse(
         return commands.toCharArray().map { readCommand(it) }
     }
 
-    private fun readCommand(it: Char) = Command.valueOf(it.toString())
+    private fun readCommand(commandChar: Char) = Command.valueOf(commandChar.toString())
 
     fun executeCommands(commands: String) : Mouse {
         return receiveCommands(commands)
@@ -44,31 +72,12 @@ class Mouse(
 
     private fun doCommand(command: Command): Mouse {
         return when (command) {
-            Command.F -> Mouse(map, map.move(position, direction.step), direction)
-            Command.B -> Mouse(map, map.move(position, direction.step.invert()), direction)
-            Command.L -> Mouse(map, position, turnLeft())
-            Command.R -> Mouse(map, position, turnRight())
+            Command.F -> Mouse(map, map.move(position, direction.unitMovement()), direction)
+            Command.B -> Mouse(map, map.move(position, direction.unitMovement().invert()), direction)
+            Command.L -> Mouse(map, position, direction.antiClockwise())
+            Command.R -> Mouse(map, position, direction.clockwise())
         }
     }
-
-    private fun turnLeft() : Direction {
-        return when(direction) {
-            Direction.N -> Direction.W
-            Direction.S -> Direction.E
-            Direction.W -> Direction.S
-            Direction.E -> Direction.N
-        }
-    }
-
-    private fun turnRight() : Direction {
-        return when(direction) {
-            Direction.N -> Direction.E
-            Direction.S -> Direction.W
-            Direction.W -> Direction.N
-            Direction.E -> Direction.S
-        }
-    }
-
 
 }
 

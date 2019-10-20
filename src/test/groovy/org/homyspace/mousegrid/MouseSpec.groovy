@@ -12,7 +12,7 @@ class MouseSpec extends Specification {
         given:
         def initialMap = new Map()
         def initialPosition = new Point(2, 2)
-        def initialDirection = Direction.W
+        def initialDirection = Direction.@N
 
         when:
         Mouse mouse = new Mouse(initialMap, initialPosition, initialDirection)
@@ -27,7 +27,7 @@ class MouseSpec extends Specification {
         given:
         def initialMap = new Map(10, 10)
         def initialPosition = new Point(20, 20)
-        def initialDirection = Direction.N
+        def initialDirection = Direction.@N
 
         when:
         new Mouse(initialMap, initialPosition, initialDirection)
@@ -80,16 +80,16 @@ class MouseSpec extends Specification {
         Mouse mouse = new Mouse()
 
         when:
-        def rover = mouse.executeCommands(commands)
+        mouse = mouse.executeCommands(commands)
 
         then:
-        rover.broadcastPosition() == position
-        rover.broadcastDirection() == direction
+        mouse.broadcastPosition() == position
+        mouse.broadcastDirection() == direction
 
         where:
         commands | position        | direction
-        "FFFB"   | new Point(0, 2) | Direction.N
-        "FFBB"   | new Point(0, 0) | Direction.N
+        "FFFB"   | new Point(0, 2) | Direction.@N
+        "FFBB"   | new Point(0, 0) | Direction.@N
 
     }
 
@@ -97,23 +97,23 @@ class MouseSpec extends Specification {
     def 'on turn commands "#commands", then new direction "#newDirection"'() {
 
         given:
-        Mouse mouse = new Mouse(new Map(), new Point(0, 0), Direction.N)
+        Mouse mouse = new Mouse(new Map(), new Point(0, 0), Direction.@N)
 
         when:
-        def rover = mouse.executeCommands(commands)
+        mouse = mouse.executeCommands(commands)
 
         then:
-        rover.broadcastPosition() == new Point(0, 0)
-        rover.broadcastDirection() == newDirection
+        mouse.broadcastPosition() == new Point(0, 0)
+        mouse.broadcastDirection() == newDirection
 
         where:
         commands | newDirection
-        "LL"     | Direction.S
-        "LR"     | Direction.N
-        "RL"     | Direction.N
-        "RR"     | Direction.S
-        "LLL"    | Direction.E
-        "RRR"    | Direction.W
+        "LL"     | Direction.@S
+        "LR"     | Direction.@N
+        "RL"     | Direction.@N
+        "RR"     | Direction.@S
+        "LLL"    | Direction.@E
+        "RRR"    | Direction.@W
 
     }
 
@@ -124,16 +124,16 @@ class MouseSpec extends Specification {
         Mouse mouse = new Mouse()
 
         when:
-        def rover = mouse.executeCommands(commands)
+        mouse = mouse.executeCommands(commands)
 
         then:
-        rover.broadcastPosition() == position
-        rover.broadcastDirection() == direction
+        mouse.broadcastPosition() == newPosition
+        mouse.broadcastDirection() == newDirection
 
         where:
-        commands  | position        | direction
-        "FRFR"    | new Point(1, 1) | Direction.S
-        "RFFFLFF" | new Point(3, 2) | Direction.N
+        commands  | newPosition     | newDirection
+        "FRFR"    | new Point(1, 1) | Direction.@S
+        "RFFFLFF" | new Point(3, 2) | Direction.@N
 
     }
 

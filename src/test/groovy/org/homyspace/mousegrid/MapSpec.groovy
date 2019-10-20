@@ -53,7 +53,7 @@ class MapSpec extends Specification {
 
     def 'can provide obstacles inside map'() {
         given:
-        Map map = new Map(5, 10, new Obstacle(0, 0), new Obstacle(2, 3))
+        Map map = new Map(10, 10, new Obstacle(0, 0), new Obstacle(2, 3))
 
         when:
         Set<Obstacle> obstacles = map.obstacles
