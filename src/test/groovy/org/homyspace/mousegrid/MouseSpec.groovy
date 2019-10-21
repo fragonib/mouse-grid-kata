@@ -8,42 +8,42 @@ class MouseSpec extends Specification {
     def 'has an initial position and direction'() {
 
         given:
-        def initialMap = new Grid()
+        def initialGrid = new Grid()
         def initialPosition = new PositivePoint(2, 2)
         def initialDirection = Direction.@N
 
         when:
-        Mouse mouse = new Mouse(initialMap, initialPosition, initialDirection)
+        Mouse mouse = new Mouse(initialGrid, initialPosition, initialDirection)
 
         then:
         mouse.broadcastPosition() == initialPosition
         mouse.broadcastDirection() == initialDirection
     }
 
-    def 'complains if is NOT inside a map'() {
+    def 'complains if is NOT inside grid'() {
 
         given:
-        def initialMap = new Grid(10, 10)
+        def initialGrid = new Grid(10, 10)
         def initialPosition = new PositivePoint(20, 20)
         def initialDirection = Direction.@N
 
         when:
-        new Mouse(initialMap, initialPosition, initialDirection)
+        new Mouse(initialGrid, initialPosition, initialDirection)
 
         then:
         def error = thrown(IllegalArgumentException)
-        error.message.contains("mouse 'position' should be inside map")
+        error.message.contains("mouse 'position' should be inside grid")
     }
 
     def 'complains if is inside an obstacle'() {
 
         given:
-        def initialMap = new Grid(10, 10, new Obstacle(2, 4))
+        def initialGrid = new Grid(10, 10, new Obstacle(2, 4))
         def initialPosition = new PositivePoint(2, 4)
         def initialDirection = Direction.@N
 
         when:
-        new Mouse(initialMap, initialPosition, initialDirection)
+        new Mouse(initialGrid, initialPosition, initialDirection)
 
         then:
         def error = thrown(IllegalArgumentException)
@@ -53,17 +53,20 @@ class MouseSpec extends Specification {
     @Unroll
     def 'receive valid commands "#commands"'() {
 
-        when:
+        given:
         Mouse mouse = new Mouse()
 
+        when:
+        def readCommands = mouse.receiveCommands(commandSequence)
+
         then:
-        mouse.receiveCommands(commands) == commandsRead
+        readCommands == expectedCommands
 
         where:
-        commands | commandsRead
-        ""       | [ ]
-        "FB"     | [ Command.F, Command.B ]
-        "LR"     | [ Command.L, Command.R ]
+        commandSequence | expectedCommands
+        ""              | [ ]
+        "FB"            | [ Command.F, Command.B ]
+        "LR"            | [ Command.L, Command.R ]
     }
 
     @Unroll
@@ -96,11 +99,11 @@ class MouseSpec extends Specification {
         mouse = mouse.executeCommands(commands)
 
         then:
-        mouse.broadcastPosition() == position
-        mouse.broadcastDirection() == direction
+        mouse.broadcastPosition() == expectedPosition
+        mouse.broadcastDirection() == expectedDirection
 
         where:
-        commands | position                | direction
+        commands | expectedPosition        | expectedDirection
         "FFFB"   | new PositivePoint(0, 2) | Direction.@N
         "FFBB"   | new PositivePoint(0, 0) | Direction.@N
     }
@@ -109,17 +112,20 @@ class MouseSpec extends Specification {
     def 'carry on turn commands "#commands", then new direction "#newDirection"'() {
 
         given:
-        Mouse mouse = new Mouse(new Grid(), new PositivePoint(0, 0), Direction.@N)
+        def grid = new Grid()
+        def initialPosition = new PositivePoint(0, 0)
+        def initialDirection = Direction.@N
+        Mouse mouse = new Mouse(grid, initialPosition, initialDirection)
 
         when:
         mouse = mouse.executeCommands(commands)
 
         then:
-        mouse.broadcastPosition() == new PositivePoint(0, 0)
-        mouse.broadcastDirection() == newDirection
+        mouse.broadcastPosition() == initialPosition
+        mouse.broadcastDirection() == expectedDirection
 
         where:
-        commands | newDirection
+        commands | expectedDirection
         "LL"     | Direction.@S
         "LR"     | Direction.@N
         "RL"     | Direction.@N
@@ -133,10 +139,10 @@ class MouseSpec extends Specification {
     def 'carry on a mix of movement and turn commands "#commands"'() {
 
         given:
-        Grid initialMap = new Grid(5, 5)
+        def initialGrid = new Grid(5, 5)
         def initialPosition = new PositivePoint()
         def initialDirection = Direction.@N
-        Mouse mouse = new Mouse(initialMap, initialPosition, initialDirection)
+        Mouse mouse = new Mouse(initialGrid, initialPosition, initialDirection)
 
         when:
         mouse = mouse.executeCommands(commands)
@@ -161,23 +167,23 @@ class MouseSpec extends Specification {
 
         given:
         def obstacle = new Obstacle(2, 3)
-        def initialMap = new Grid(5, 5, obstacle)
+        def initialGrid = new Grid(5, 5, obstacle)
         def initialPosition = new PositivePoint()
         def initialDirection = Direction.@N
-        Mouse mouse = new Mouse(initialMap, initialPosition, initialDirection)
+        Mouse mouse = new Mouse(initialGrid, initialPosition, initialDirection)
 
         when:
         mouse = mouse.executeCommands(commands)
 
         then:
-        expectedClass.isCase(mouse)
+        expectedMouseType.isCase(mouse)
         mouse.broadcastPosition() == expectedPosition
         mouse.broadcastDirection() == expectedDirection
         if (mouse instanceof BlockedMouse)
             ((BlockedMouse) mouse).broadcastObstacle() == obstacle
 
         where:
-        commands  | expectedPosition        | expectedDirection | expectedClass
+        commands  | expectedPosition        | expectedDirection | expectedMouseType
         "FRFR"    | new PositivePoint(1, 1) | Direction.@S      | Mouse
         "RFFLFFF" | new PositivePoint(2, 2) | Direction.@N      | BlockedMouse
         "FFFRFF"  | new PositivePoint(1, 3) | Direction.@E      | BlockedMouse
