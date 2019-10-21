@@ -12,7 +12,7 @@ open class Mouse(
         require(grid.containsPoint(currentPosition)) {
             "mouse 'position' should be inside map"
         }
-        require(grid.isObstacleOn(currentPosition).isEmpty()) {
+        require(grid.obstacleOn(currentPosition).isEmpty()) {
             "mouse 'position' should NOT be inside an obstacle"
         }
     }

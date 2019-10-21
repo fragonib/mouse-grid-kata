@@ -48,6 +48,7 @@ class GridSpec extends Specification {
         then:
         obstacles.size() == 1
         obstacles.contains(insideObstacle) == true
+        obstacles.contains(outsideObstacle) == false
     }
 
     def 'detects no obstacles on specific points'() {
@@ -58,7 +59,7 @@ class GridSpec extends Specification {
 
         when:
         def target = new PositivePoint(x, y)
-        def optionalObstacle = grid.isObstacleOn(target)
+        def optionalObstacle = grid.obstacleOn(target)
 
         then:
         optionalObstacle.isEmpty()
@@ -78,7 +79,7 @@ class GridSpec extends Specification {
 
         when:
         def target = new PositivePoint(x, y)
-        def optionalObstacle = grid.isObstacleOn(target)
+        def optionalObstacle = grid.obstacleOn(target)
 
         then:
         optionalObstacle.isDefined()

@@ -5,23 +5,21 @@ package org.homyspace.mousegrid
 
 import arrow.core.Either
 import arrow.core.Option
-import java.util.*
 
 class Obstacle(x: Int, y: Int) {
     private val position: PositivePoint = PositivePoint(x, y)
 
-    fun isOccupying(targetPoint: PositivePoint) = targetPoint == position
+    fun occupies(targetPoint: PositivePoint) = targetPoint == position
 
     fun isInside(area: Area) = area.contains(position)
 }
 
-class Grid(width: Int = 10, height: Int = 10) {
+class Grid(width: Int = 10, height: Int = 10, vararg obstacles: Obstacle = arrayOf()) {
 
     val area: Area = Area(width, height)
-    var obstacles: Set<Obstacle> = Collections.emptySet()
+    val obstacles: Set<Obstacle>
 
-    constructor(width: Int = 10, height: Int = 10, vararg obstacles: Obstacle) :
-            this(width, height) {
+    init {
         this.obstacles = obstacles
                 .filter { it.isInside(area) }
                 .toSet()
@@ -29,13 +27,13 @@ class Grid(width: Int = 10, height: Int = 10) {
 
     fun containsPoint(targetPoint: PositivePoint) = area.contains(targetPoint)
 
-    fun isObstacleOn(targetPoint: PositivePoint) : Option<Obstacle> {
-        return Option.fromNullable(obstacles.find { it.isOccupying(targetPoint) })
+    fun obstacleOn(targetPoint: PositivePoint) : Option<Obstacle> {
+        return Option.fromNullable(obstacles.find { it.occupies(targetPoint) })
     }
 
     fun move(from: PositivePoint, movement: Vector) : Either<Obstacle, PositivePoint> {
         val targetPoint = calculateNewPoint(from, movement)
-        return isObstacleOn(targetPoint)
+        return obstacleOn(targetPoint)
                 .toEither { targetPoint }
                 .swap()
     }
