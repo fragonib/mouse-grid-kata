@@ -41,7 +41,7 @@ class GeometrySpec extends Specification {
         10     | -10    | -10            | 10
     }
     
-    def 'area can be created width valid dimensions'() {
+    def 'area can be created with valid dimensions'() {
         when:
         def area = new Area(width, height)
 
@@ -86,9 +86,10 @@ class GeometrySpec extends Specification {
         x  | y  | expectedInsideness
         0  | 0  | true
         5  | 5  | true
-        10 | 0  | true
-        0  | 10 | true
-        10 | 10 | true
+        9  | 9  | true
+        10 | 0  | false
+        0  | 10 | false
+        10 | 10 | false
         0  | 11 | false
         11 | 0  | false
     }

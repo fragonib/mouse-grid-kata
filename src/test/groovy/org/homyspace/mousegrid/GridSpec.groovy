@@ -38,9 +38,9 @@ class GridSpec extends Specification {
 
     def 'obstacles outside grid are ignored'() {
         given:
-        def insideObstacle = new Obstacle(5, 5)
+        def insideObstacle = new Obstacle(4, 4)
         def outsideObstacle = new Obstacle(10, 10)
-        Grid grid = new Grid(5, 10, outsideObstacle, insideObstacle)
+        Grid grid = new Grid(5, 5, outsideObstacle, insideObstacle)
 
         when:
         Set<Obstacle> obstacles = grid.obstacles

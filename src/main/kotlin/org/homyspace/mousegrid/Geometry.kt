@@ -24,7 +24,7 @@ data class Area(val width: Int, val height: Int) {
     }
 
     fun contains(point: PositivePoint): Boolean {
-        return point.x <= this.width && point.y <= this.height
+        return point.x < this.width && point.y < this.height
     }
 
 }
