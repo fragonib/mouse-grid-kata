@@ -63,11 +63,13 @@ open class Mouse(
 }
 
 class BlockedMouse(
-        private val grid: Grid,
-        private val currentPosition: PositivePoint,
-        private val currentDirection: Direction,
-        val blockingObstacle: Obstacle) : Mouse(grid, currentPosition, currentDirection) {
-    
+        grid: Grid, currentPosition: PositivePoint, currentDirection: Direction,
+        private val blockingObstacle: Obstacle) : Mouse(grid, currentPosition, currentDirection) {
+
+    fun broadcastObstacle() : Obstacle {
+        return blockingObstacle
+    }
+
 } 
 
 

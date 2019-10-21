@@ -174,7 +174,7 @@ class MouseSpec extends Specification {
         mouse.broadcastPosition() == expectedPosition
         mouse.broadcastDirection() == expectedDirection
         if (mouse instanceof BlockedMouse)
-            ((BlockedMouse) mouse).getBlockingObstacle() == obstacle
+            ((BlockedMouse) mouse).broadcastObstacle() == obstacle
 
         where:
         commands  | expectedPosition        | expectedDirection | expectedClass
