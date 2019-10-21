@@ -51,7 +51,19 @@ class GridSpec extends Specification {
         obstacles.contains(outsideObstacle) == false
     }
 
-    def 'detects no obstacles on specific points'() {
+    def 'only distinct obstacles are considered'() {
+        given:
+        def anObstacle = new Obstacle(4, 4)
+        Grid grid = new Grid(5, 5, anObstacle, anObstacle, anObstacle)
+
+        when:
+        Set<Obstacle> obstacles = grid.obstacles
+
+        then:
+        obstacles.size() == 1
+    }
+
+    def 'detects no obstacles on free points'() {
         given:
         def firstObstacle = new Obstacle(5, 5)
         def secondObstacle = new Obstacle(2, 3)
@@ -71,7 +83,7 @@ class GridSpec extends Specification {
         5 | 6
     }
 
-    def 'detects obstacles on specific points'() {
+    def 'detects obstacles on blocking points'() {
         given:
         def firstObstacle = new Obstacle(5, 5)
         def secondObstacle = new Obstacle(2, 3)
