@@ -25,6 +25,21 @@ class GeometrySpec extends Specification {
         -1 | 0   | "'x=-1' and should be greater or equal than 0"
         10 | -10 | "'y=-10' and should be greater or equal than 0"
     }
+
+    def 'vector can be defined and inverted'() {
+        when:
+        def vector = new Vector(xShift, yShift)
+        def newVector = vector.invertWay()
+
+        then:
+        newVector == new Vector(invertedXShift, invertedYShift)
+
+        where:
+        xShift | yShift | invertedXShift | invertedYShift
+        0      | 0      | 0              | 0
+        -1     | 0      | 1              | 0
+        10     | -10    | -10            | 10
+    }
     
     def 'area can be created width valid dimensions'() {
         when:

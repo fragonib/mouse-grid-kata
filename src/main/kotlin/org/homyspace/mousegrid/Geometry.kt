@@ -10,6 +10,12 @@ data class PositivePoint(val x: Int = 0, val y: Int = 0) {
     }
 }
 
+data class Vector(val xShift: Int, val yShift: Int) {
+    fun invertWay() : Vector {
+        return Vector(xShift * -1, yShift * -1)
+    }
+}
+
 data class Area(val width: Int, val height: Int) {
 
     init {
