@@ -5,24 +5,24 @@ package org.homyspace.mousegrid
 
 open class Mouse(
         private val grid: Grid = Grid(),
-        private val currentPosition: PositivePoint = PositivePoint(),
-        private val currentDirection: Direction = Direction.N) {
+        private val position: PositivePoint = PositivePoint(),
+        private val direction: Direction = Direction.N) {
 
     init {
-        require(grid.containsPoint(currentPosition)) {
+        require(grid.containsPoint(position)) {
             "mouse 'position' should be inside grid"
         }
-        require(grid.obstacleOn(currentPosition).isEmpty()) {
+        require(grid.obstacleOn(position).isEmpty()) {
             "mouse 'position' should NOT be inside an obstacle"
         }
     }
     
     fun broadcastPosition() : PositivePoint {
-        return currentPosition
+        return position
     }
 
     fun broadcastDirection() : Direction {
-        return currentDirection
+        return direction
     }
 
     fun receiveCommands(commands: String) : List<Command> {
@@ -44,17 +44,17 @@ open class Mouse(
         return when (val mouseAction = command.mouseAction) {
 
             is MouseAction.MovementAction -> {
-                mouseAction.move(grid, currentPosition, currentDirection)
+                mouseAction.move(grid, position, direction)
                         .fold({ 
-                            BlockedMouse(grid, currentPosition, currentDirection, it) 
+                            BlockedMouse(grid, position, direction, it)
                         }, { 
-                            Mouse(grid, it, currentDirection) 
+                            Mouse(grid, it, direction)
                         })
             }
 
             is MouseAction.TurningAction -> {
-                val newDirection = mouseAction.turn(currentDirection)
-                Mouse(grid, currentPosition, newDirection)
+                val newDirection = mouseAction.turn(direction)
+                Mouse(grid, position, newDirection)
             }
 
         }
@@ -63,8 +63,8 @@ open class Mouse(
 }
 
 class BlockedMouse(
-        grid: Grid, currentPosition: PositivePoint, currentDirection: Direction,
-        private val blockingObstacle: Obstacle) : Mouse(grid, currentPosition, currentDirection) {
+        grid: Grid, position: PositivePoint, direction: Direction,
+        private val blockingObstacle: Obstacle) : Mouse(grid, position, direction) {
 
     fun broadcastObstacle() : Obstacle {
         return blockingObstacle
