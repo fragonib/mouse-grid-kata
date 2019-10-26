@@ -166,27 +166,27 @@ class MouseSpec extends Specification {
     def 'carry on commands "#commands" when obstacles on grid'() {
 
         given:
-        def obstacle = new Obstacle(2, 3)
-        def initialGrid = new Grid(5, 5, obstacle)
+        def someObstacle = new Obstacle(2, 3)
+        def initialGrid = new Grid(5, 5, someObstacle)
         def initialPosition = new PositivePoint()
         def initialDirection = Direction.@N
         Mouse mouse = new Mouse(initialGrid, initialPosition, initialDirection)
 
         when:
-        mouse = mouse.executeCommands(commands)
+        Mouse actualMouse = mouse.executeCommands(commands)
 
         then:
-        expectedMouseType.isCase(mouse)
-        mouse.broadcastPosition() == expectedPosition
-        mouse.broadcastDirection() == expectedDirection
-        if (mouse instanceof BlockedMouse)
-            ((BlockedMouse) mouse).broadcastObstacle() == obstacle
+        expectedMouseType.isCase(actualMouse)
+        actualMouse.broadcastPosition() == expectedPosition
+        actualMouse.broadcastDirection() == expectedDirection
+        if (actualMouse instanceof BlockedMouse)
+            assert ((BlockedMouse) actualMouse).broadcastObstacle() == someObstacle
 
         where:
-        commands  | expectedPosition        | expectedDirection | expectedMouseType
-        "FRFR"    | new PositivePoint(1, 1) | Direction.@S      | Mouse
-        "RFFLFFF" | new PositivePoint(2, 2) | Direction.@N      | BlockedMouse
-        "FFFRFF"  | new PositivePoint(1, 3) | Direction.@E      | BlockedMouse
+        commands     | expectedPosition        | expectedDirection | expectedMouseType
+        "FRFR"       | new PositivePoint(1, 1) | Direction.@S      | Mouse
+        "RFFLFFFRFF" | new PositivePoint(2, 2) | Direction.@N      | BlockedMouse
+        "FFFRFFFLFF" | new PositivePoint(1, 3) | Direction.@E      | BlockedMouse
 
     }
 
