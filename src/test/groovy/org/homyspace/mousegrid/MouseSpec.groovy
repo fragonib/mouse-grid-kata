@@ -5,7 +5,7 @@ import spock.lang.Unroll
 
 class MouseSpec extends Specification {
 
-    def 'has an initial position and direction'() {
+    def 'has given an initial position and direction'() {
 
         given:
         def initialGrid = new Grid()
@@ -51,7 +51,7 @@ class MouseSpec extends Specification {
     }
 
     @Unroll
-    def 'receive valid commands "#commands"'() {
+    def 'receive valid commands "#commandSequence"'() {
 
         given:
         Mouse mouse = new ReadyMouse()
@@ -70,7 +70,7 @@ class MouseSpec extends Specification {
     }
 
     @Unroll
-    def 'complains with invalid "#commands"'() {
+    def 'complains with invalid commands "#commands"'() {
 
         given:
         Mouse mouse = new ReadyMouse()
@@ -90,7 +90,7 @@ class MouseSpec extends Specification {
     }
 
     @Unroll
-    def 'carry on move commands "#commands"'() {
+    def 'execute move commands "#commands"'() {
 
         given:
         Mouse mouse = new ReadyMouse()
@@ -106,10 +106,11 @@ class MouseSpec extends Specification {
         commands | expectedPosition        | expectedDirection
         "FFFB"   | new PositivePoint(0, 2) | Direction.@N
         "FFBB"   | new PositivePoint(0, 0) | Direction.@N
+        "BBB"    | new PositivePoint(0, 7) | Direction.@N
     }
 
     @Unroll
-    def 'carry on turn commands "#commands", then new direction "#newDirection"'() {
+    def 'execute turn commands "#commands", then new direction "#expectedDirection"'() {
 
         given:
         def grid = new Grid()
@@ -136,7 +137,7 @@ class MouseSpec extends Specification {
     }
 
     @Unroll
-    def 'carry on a mix of movement and turn commands "#commands"'() {
+    def 'execute a mix of movement and turn commands "#commands"'() {
 
         given:
         def initialGrid = new Grid(5, 5)
@@ -163,7 +164,7 @@ class MouseSpec extends Specification {
     }
 
     @Unroll
-    def 'carry on commands "#commands" when obstacles on grid'() {
+    def 'execute all commands "#commands" when #scenario'() {
 
         given:
         def someObstacle = new Obstacle(2, 3)
@@ -176,17 +177,41 @@ class MouseSpec extends Specification {
         mouse = mouse.executeCommands(commands)
 
         then:
-        expectedMouseType.isCase(mouse)
+        mouse instanceof ReadyMouse
         mouse.broadcastPosition() == expectedPosition
         mouse.broadcastDirection() == expectedDirection
-        if (mouse instanceof BlockedMouse)
-            assert ((BlockedMouse) mouse).broadcastObstacle() == someObstacle
 
         where:
-        commands     | expectedPosition        | expectedDirection | expectedMouseType
-        "FRFR"       | new PositivePoint(1, 1) | Direction.@S      | ReadyMouse
-        "RFFLFFFRFF" | new PositivePoint(2, 2) | Direction.@N      | BlockedMouse
-        "FFFRFFFLFF" | new PositivePoint(1, 3) | Direction.@E      | BlockedMouse
+        commands         | expectedPosition        | expectedDirection | scenario
+        "FRFR"           | new PositivePoint(1, 1) | Direction.@S      | 'passing far from obstacle'
+        "FFFRF"          | new PositivePoint(1, 3) | Direction.@E      | 'next to obstacle'
+        "RFFLFFRFLFFLFR" | new PositivePoint(2, 4) | Direction.@N      | 'moving around obstacle'
+
+    }
+
+    @Unroll
+    def 'execute commands "#commands" before collision with obstacle when #scenario'() {
+
+        given:
+        def someObstacle = new Obstacle(2, 3)
+        def initialGrid = new Grid(5, 5, someObstacle)
+        def initialPosition = new PositivePoint()
+        def initialDirection = Direction.@N
+        Mouse mouse = new ReadyMouse(initialGrid, initialPosition, initialDirection)
+
+        when:
+        mouse = mouse.executeCommands(commands)
+
+        then:
+        mouse instanceof BlockedMouse
+        mouse.broadcastPosition() == expectedLastPosition
+        mouse.broadcastDirection() == expectedDirection
+        ((BlockedMouse) mouse).broadcastObstacle() == someObstacle
+
+        where:
+        commands     | expectedLastPosition    | expectedDirection | scenario
+        "RFFLFFFRFF" | new PositivePoint(2, 2) | Direction.@N      | 'colliding from left'
+        "FFFRFFFLFF" | new PositivePoint(1, 3) | Direction.@E      | 'colliding from bottom'
 
     }
 
