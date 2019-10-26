@@ -65,8 +65,8 @@ class MouseSpec extends Specification {
         where:
         commandSequence | expectedCommands
         ""              | [ ]
-        "FB"            | [ Command.F, Command.B ]
-        "LR"            | [ Command.L, Command.R ]
+        "FB"            | [ MoveForward.INSTANCE, MoveBackwards.INSTANCE ]
+        "LR"            | [ TurnLeft.INSTANCE, TurnRight.INSTANCE ]
     }
 
     @Unroll
@@ -80,10 +80,10 @@ class MouseSpec extends Specification {
 
         then:
         def error = thrown(expectedException)
-        error.message.contains(expectedMessage)
+        error.message.contains(expectedMessageSubstring)
 
         where:
-        commands | expectedException        | expectedMessage
+        commands | expectedException        | expectedMessageSubstring
         "W"      | IllegalArgumentException | 'Command.W'
         "FFXF"   | IllegalArgumentException | 'Command.X'
 

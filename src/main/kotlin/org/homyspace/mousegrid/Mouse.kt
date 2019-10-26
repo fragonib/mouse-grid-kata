@@ -1,12 +1,12 @@
 /*
- * It's responsible for defining mouse operations
+ * It's responsible for defining mouse operations. It uses immutability and open/closed principle.
  */
 package org.homyspace.mousegrid
 
-open class Mouse(
-        private val grid: Grid = Grid(),
-        private val position: PositivePoint = PositivePoint(),
-        private val direction: Direction = Direction.N) {
+abstract class BaseMouse(
+        protected val grid: Grid,
+        protected val position: PositivePoint,
+        protected val direction: Direction) {
 
     init {
         require(grid.containsPoint(position)) {
@@ -25,53 +25,73 @@ open class Mouse(
         return direction
     }
 
-    fun receiveCommands(commands: String) : List<Command> {
+    fun receiveCommands(commands: String) : List<MouseAction> {
         return commands.toCharArray()
                 .map { readCommand(it) }
     }
 
-    fun executeCommands(commands: String) : Mouse {
+    fun executeCommands(commands: String) : BaseMouse {
         return receiveCommands(commands)
                 .fold(this, { mouse, command ->
                     if (mouse is BlockedMouse) mouse else mouse.doCommand(command)
                 })
     }
 
-    private fun readCommand(commandChar: Char) : Command {
-        return Command.valueOf(commandChar.toString())
+    abstract fun readCommand(commandChar: Char) : MouseAction
+
+    abstract fun doCommand(mouseAction: MouseAction): BaseMouse
+
+}
+
+class BlockedMouse(
+        grid: Grid, position: PositivePoint, direction: Direction,
+        private val blockingObstacle: Obstacle) : BaseMouse(grid, position, direction) {
+
+    fun broadcastObstacle() : Obstacle {
+        return blockingObstacle
     }
 
-    private fun doCommand(command: Command): Mouse {
-        
-        return when (val mouseAction = command.mouseAction) {
+    override fun readCommand(commandChar: Char) : MouseAction {
+        return Command.valueOf(commandChar.toString()).mouseAction
+    }
+
+    override fun doCommand(mouseAction: MouseAction): BaseMouse {
+        return this
+    }
+
+}
+
+class Mouse(
+        grid: Grid = Grid(),
+        position: PositivePoint = PositivePoint(),
+        direction: Direction = Direction.N) : BaseMouse(grid, position, direction) {
+
+    override fun readCommand(commandChar: Char) : MouseAction {
+        return Command.valueOf(commandChar.toString()).mouseAction
+    }
+
+    override fun doCommand(mouseAction: MouseAction) : BaseMouse {
+
+        when (mouseAction) {
 
             is MouseAction.MovementAction -> {
-                mouseAction.move(grid, position, direction)
-                        .fold({ 
+                val fold = mouseAction.move(grid, position, direction)
+                        .fold({
                             BlockedMouse(grid, position, direction, it)
-                        }, { 
+                        }, {
                             Mouse(grid, it, direction)
                         })
+                return fold
             }
 
             is MouseAction.TurningAction -> {
                 val newDirection = mouseAction.turn(direction)
-                Mouse(grid, position, newDirection)
+                return Mouse(grid, position, newDirection)
             }
 
         }
     }
 
 }
-
-class BlockedMouse(
-        grid: Grid, position: PositivePoint, direction: Direction,
-        private val blockingObstacle: Obstacle) : Mouse(grid, position, direction) {
-
-    fun broadcastObstacle() : Obstacle {
-        return blockingObstacle
-    }
-
-} 
 
 
