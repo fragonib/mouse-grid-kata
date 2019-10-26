@@ -32,9 +32,7 @@ abstract class Mouse(
 
     fun executeCommands(commands: String) : Mouse {
         return receiveCommands(commands)
-                .fold(this, { mouse, command ->
-                    if (mouse is BlockedMouse) mouse else mouse.doCommand(command)
-                })
+                .fold(this, { mouse, command -> mouse.doCommand(command) })
     }
 
     abstract fun readCommand(commandChar: Char) : MouseAction
