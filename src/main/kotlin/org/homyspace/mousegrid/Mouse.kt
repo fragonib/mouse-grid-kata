@@ -53,13 +53,16 @@ class BlockedMouse(
         return Command.valueOf(commandChar.toString()).mouseAction
     }
 
+    /**
+     * A blocked mouse can't execute new commands
+     */
     override fun doCommand(mouseAction: MouseAction): Mouse {
         return this
     }
 
 }
 
-class FreeMouse(
+class ReadyMouse(
         grid: Grid = Grid(),
         position: PositivePoint = PositivePoint(),
         direction: Direction = Direction.N) : Mouse(grid, position, direction) {
@@ -73,18 +76,17 @@ class FreeMouse(
         when (mouseAction) {
 
             is MouseAction.MovementAction -> {
-                val fold = mouseAction.move(grid, position, direction)
+                return mouseAction.move(grid, position, direction)
                         .fold({
                             BlockedMouse(grid, position, direction, it)
                         }, {
-                            FreeMouse(grid, it, direction)
+                            ReadyMouse(grid, it, direction)
                         })
-                return fold
             }
 
             is MouseAction.TurningAction -> {
                 val newDirection = mouseAction.turn(direction)
-                return FreeMouse(grid, position, newDirection)
+                return ReadyMouse(grid, position, newDirection)
             }
 
         }

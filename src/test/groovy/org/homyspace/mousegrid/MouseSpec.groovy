@@ -13,7 +13,7 @@ class MouseSpec extends Specification {
         def initialDirection = Direction.@N
 
         when:
-        Mouse mouse = new FreeMouse(initialGrid, initialPosition, initialDirection)
+        Mouse mouse = new ReadyMouse(initialGrid, initialPosition, initialDirection)
 
         then:
         mouse.broadcastPosition() == initialPosition
@@ -28,7 +28,7 @@ class MouseSpec extends Specification {
         def initialDirection = Direction.@N
 
         when:
-        new FreeMouse(initialGrid, initialPosition, initialDirection)
+        new ReadyMouse(initialGrid, initialPosition, initialDirection)
 
         then:
         def error = thrown(IllegalArgumentException)
@@ -43,7 +43,7 @@ class MouseSpec extends Specification {
         def initialDirection = Direction.@N
 
         when:
-        new FreeMouse(initialGrid, initialPosition, initialDirection)
+        new ReadyMouse(initialGrid, initialPosition, initialDirection)
 
         then:
         def error = thrown(IllegalArgumentException)
@@ -54,7 +54,7 @@ class MouseSpec extends Specification {
     def 'receive valid commands "#commands"'() {
 
         given:
-        Mouse mouse = new FreeMouse()
+        Mouse mouse = new ReadyMouse()
 
         when:
         def actions = mouse.receiveCommands(commandSequence)
@@ -73,7 +73,7 @@ class MouseSpec extends Specification {
     def 'complains with invalid "#commands"'() {
 
         given:
-        Mouse mouse = new FreeMouse()
+        Mouse mouse = new ReadyMouse()
 
         when:
         mouse.receiveCommands(commands)
@@ -93,7 +93,7 @@ class MouseSpec extends Specification {
     def 'carry on move commands "#commands"'() {
 
         given:
-        Mouse mouse = new FreeMouse()
+        Mouse mouse = new ReadyMouse()
 
         when:
         mouse = mouse.executeCommands(commands)
@@ -115,7 +115,7 @@ class MouseSpec extends Specification {
         def grid = new Grid()
         def initialPosition = new PositivePoint(0, 0)
         def initialDirection = Direction.@N
-        Mouse mouse = new FreeMouse(grid, initialPosition, initialDirection)
+        Mouse mouse = new ReadyMouse(grid, initialPosition, initialDirection)
 
         when:
         mouse = mouse.executeCommands(commands)
@@ -142,7 +142,7 @@ class MouseSpec extends Specification {
         def initialGrid = new Grid(5, 5)
         def initialPosition = new PositivePoint()
         def initialDirection = Direction.@N
-        Mouse mouse = new FreeMouse(initialGrid, initialPosition, initialDirection)
+        Mouse mouse = new ReadyMouse(initialGrid, initialPosition, initialDirection)
 
         when:
         mouse = mouse.executeCommands(commands)
@@ -170,7 +170,7 @@ class MouseSpec extends Specification {
         def initialGrid = new Grid(5, 5, someObstacle)
         def initialPosition = new PositivePoint()
         def initialDirection = Direction.@N
-        Mouse mouse = new FreeMouse(initialGrid, initialPosition, initialDirection)
+        Mouse mouse = new ReadyMouse(initialGrid, initialPosition, initialDirection)
 
         when:
         mouse = mouse.executeCommands(commands)
@@ -184,7 +184,7 @@ class MouseSpec extends Specification {
 
         where:
         commands     | expectedPosition        | expectedDirection | expectedMouseType
-        "FRFR"       | new PositivePoint(1, 1) | Direction.@S      | FreeMouse
+        "FRFR"       | new PositivePoint(1, 1) | Direction.@S      | ReadyMouse
         "RFFLFFFRFF" | new PositivePoint(2, 2) | Direction.@N      | BlockedMouse
         "FFFRFFFLFF" | new PositivePoint(1, 3) | Direction.@E      | BlockedMouse
 
