@@ -3,7 +3,7 @@
  */
 package org.homyspace.mousegrid
 
-abstract class BaseMouse(
+abstract class Mouse(
         protected val grid: Grid,
         protected val position: PositivePoint,
         protected val direction: Direction) {
@@ -30,7 +30,7 @@ abstract class BaseMouse(
                 .map { readCommand(it) }
     }
 
-    fun executeCommands(commands: String) : BaseMouse {
+    fun executeCommands(commands: String) : Mouse {
         return receiveCommands(commands)
                 .fold(this, { mouse, command ->
                     if (mouse is BlockedMouse) mouse else mouse.doCommand(command)
@@ -39,13 +39,13 @@ abstract class BaseMouse(
 
     abstract fun readCommand(commandChar: Char) : MouseAction
 
-    abstract fun doCommand(mouseAction: MouseAction): BaseMouse
+    abstract fun doCommand(mouseAction: MouseAction): Mouse
 
 }
 
 class BlockedMouse(
         grid: Grid, position: PositivePoint, direction: Direction,
-        private val blockingObstacle: Obstacle) : BaseMouse(grid, position, direction) {
+        private val blockingObstacle: Obstacle) : Mouse(grid, position, direction) {
 
     fun broadcastObstacle() : Obstacle {
         return blockingObstacle
@@ -55,22 +55,22 @@ class BlockedMouse(
         return Command.valueOf(commandChar.toString()).mouseAction
     }
 
-    override fun doCommand(mouseAction: MouseAction): BaseMouse {
+    override fun doCommand(mouseAction: MouseAction): Mouse {
         return this
     }
 
 }
 
-class Mouse(
+class FreeMouse(
         grid: Grid = Grid(),
         position: PositivePoint = PositivePoint(),
-        direction: Direction = Direction.N) : BaseMouse(grid, position, direction) {
+        direction: Direction = Direction.N) : Mouse(grid, position, direction) {
 
     override fun readCommand(commandChar: Char) : MouseAction {
         return Command.valueOf(commandChar.toString()).mouseAction
     }
 
-    override fun doCommand(mouseAction: MouseAction) : BaseMouse {
+    override fun doCommand(mouseAction: MouseAction) : Mouse {
 
         when (mouseAction) {
 
@@ -79,14 +79,14 @@ class Mouse(
                         .fold({
                             BlockedMouse(grid, position, direction, it)
                         }, {
-                            Mouse(grid, it, direction)
+                            FreeMouse(grid, it, direction)
                         })
                 return fold
             }
 
             is MouseAction.TurningAction -> {
                 val newDirection = mouseAction.turn(direction)
-                return Mouse(grid, position, newDirection)
+                return FreeMouse(grid, position, newDirection)
             }
 
         }

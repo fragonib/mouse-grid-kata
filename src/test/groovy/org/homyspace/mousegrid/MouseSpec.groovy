@@ -13,7 +13,7 @@ class MouseSpec extends Specification {
         def initialDirection = Direction.@N
 
         when:
-        Mouse mouse = new Mouse(initialGrid, initialPosition, initialDirection)
+        Mouse mouse = new FreeMouse(initialGrid, initialPosition, initialDirection)
 
         then:
         mouse.broadcastPosition() == initialPosition
@@ -28,7 +28,7 @@ class MouseSpec extends Specification {
         def initialDirection = Direction.@N
 
         when:
-        new Mouse(initialGrid, initialPosition, initialDirection)
+        new FreeMouse(initialGrid, initialPosition, initialDirection)
 
         then:
         def error = thrown(IllegalArgumentException)
@@ -43,7 +43,7 @@ class MouseSpec extends Specification {
         def initialDirection = Direction.@N
 
         when:
-        new Mouse(initialGrid, initialPosition, initialDirection)
+        new FreeMouse(initialGrid, initialPosition, initialDirection)
 
         then:
         def error = thrown(IllegalArgumentException)
@@ -54,16 +54,16 @@ class MouseSpec extends Specification {
     def 'receive valid commands "#commands"'() {
 
         given:
-        Mouse mouse = new Mouse()
+        Mouse mouse = new FreeMouse()
 
         when:
-        def readCommands = mouse.receiveCommands(commandSequence)
+        def actions = mouse.receiveCommands(commandSequence)
 
         then:
-        readCommands == expectedCommands
+        actions == expectedActions
 
         where:
-        commandSequence | expectedCommands
+        commandSequence | expectedActions
         ""              | [ ]
         "FB"            | [ MoveForward.INSTANCE, MoveBackwards.INSTANCE ]
         "LR"            | [ TurnLeft.INSTANCE, TurnRight.INSTANCE ]
@@ -73,7 +73,7 @@ class MouseSpec extends Specification {
     def 'complains with invalid "#commands"'() {
 
         given:
-        Mouse mouse = new Mouse()
+        Mouse mouse = new FreeMouse()
 
         when:
         mouse.receiveCommands(commands)
@@ -93,7 +93,7 @@ class MouseSpec extends Specification {
     def 'carry on move commands "#commands"'() {
 
         given:
-        Mouse mouse = new Mouse()
+        Mouse mouse = new FreeMouse()
 
         when:
         mouse = mouse.executeCommands(commands)
@@ -115,7 +115,7 @@ class MouseSpec extends Specification {
         def grid = new Grid()
         def initialPosition = new PositivePoint(0, 0)
         def initialDirection = Direction.@N
-        Mouse mouse = new Mouse(grid, initialPosition, initialDirection)
+        Mouse mouse = new FreeMouse(grid, initialPosition, initialDirection)
 
         when:
         mouse = mouse.executeCommands(commands)
@@ -142,7 +142,7 @@ class MouseSpec extends Specification {
         def initialGrid = new Grid(5, 5)
         def initialPosition = new PositivePoint()
         def initialDirection = Direction.@N
-        Mouse mouse = new Mouse(initialGrid, initialPosition, initialDirection)
+        Mouse mouse = new FreeMouse(initialGrid, initialPosition, initialDirection)
 
         when:
         mouse = mouse.executeCommands(commands)
@@ -170,21 +170,21 @@ class MouseSpec extends Specification {
         def initialGrid = new Grid(5, 5, someObstacle)
         def initialPosition = new PositivePoint()
         def initialDirection = Direction.@N
-        Mouse mouse = new Mouse(initialGrid, initialPosition, initialDirection)
+        Mouse mouse = new FreeMouse(initialGrid, initialPosition, initialDirection)
 
         when:
-        Mouse actualMouse = mouse.executeCommands(commands)
+        mouse = mouse.executeCommands(commands)
 
         then:
-        expectedMouseType.isCase(actualMouse)
-        actualMouse.broadcastPosition() == expectedPosition
-        actualMouse.broadcastDirection() == expectedDirection
-        if (actualMouse instanceof BlockedMouse)
-            assert ((BlockedMouse) actualMouse).broadcastObstacle() == someObstacle
+        expectedMouseType.isCase(mouse)
+        mouse.broadcastPosition() == expectedPosition
+        mouse.broadcastDirection() == expectedDirection
+        if (mouse instanceof BlockedMouse)
+            assert ((BlockedMouse) mouse).broadcastObstacle() == someObstacle
 
         where:
         commands     | expectedPosition        | expectedDirection | expectedMouseType
-        "FRFR"       | new PositivePoint(1, 1) | Direction.@S      | Mouse
+        "FRFR"       | new PositivePoint(1, 1) | Direction.@S      | FreeMouse
         "RFFLFFFRFF" | new PositivePoint(2, 2) | Direction.@N      | BlockedMouse
         "FFFRFFFLFF" | new PositivePoint(1, 3) | Direction.@E      | BlockedMouse
 
