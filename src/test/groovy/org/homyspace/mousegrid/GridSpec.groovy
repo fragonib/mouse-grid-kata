@@ -115,10 +115,10 @@ class GridSpec extends Specification {
         newPosition == new PositivePoint(expectedX, expectedY)
 
         where:
-        fromX | fromY | shiftX | shiftY | expectedX | expectedY
-        0     | 0     | 0      | 0      | 0         | 0
-        0     | 0     | 5      | 5      | 5         | 5
-        0     | 0     | 9      | 9      | 9         | 9
+        fromX | fromY | shiftX | shiftY || expectedX | expectedY
+        0     | 0     | 0      | 0      || 0         | 0
+        0     | 0     | 5      | 5      || 5         | 5
+        0     | 0     | 9      | 9      || 9         | 9
     }
 
     def 'wraps movements across grid edges'() {
@@ -134,10 +134,10 @@ class GridSpec extends Specification {
         newPosition == new PositivePoint(expectedX, expectedY)
 
         where:
-        fromX | fromY | shiftX | shiftY | expectedX | expectedY
-        0     | 0     | 10     | 10     | 0         | 0
-        0     | 0     | -1     | -1     | 9         | 9
-        0     | 0     | 25     | 25     | 5         | 5
+        fromX | fromY | shiftX | shiftY || expectedX | expectedY
+        0     | 0     | 10     | 10     || 0         | 0
+        0     | 0     | -1     | -1     || 9         | 9
+        0     | 0     | 25     | 25     || 5         | 5
     }
 
 }
