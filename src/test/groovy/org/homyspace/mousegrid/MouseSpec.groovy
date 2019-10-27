@@ -65,8 +65,8 @@ class MouseSpec extends Specification {
         where:
         commandSequence | expectedActions
         ""              | [ ]
-        "FB"            | [ MoveForward.INSTANCE, MoveBackwards.INSTANCE ]
-        "LR"            | [ TurnLeft.INSTANCE, TurnRight.INSTANCE ]
+        "FB"            | [ MoveStepForward.INSTANCE, MoveStepBackwards.INSTANCE ]
+        "LR"            | [ SteppedTurnLeft.INSTANCE, SteppedTurnRight.INSTANCE ]
     }
 
     @Unroll

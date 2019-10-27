@@ -42,7 +42,9 @@ abstract class Mouse(
 }
 
 class BlockedMouse(
-        grid: Grid, position: PositivePoint, direction: Direction,
+        grid: Grid = Grid(),
+        position: PositivePoint = PositivePoint(),
+        direction: Direction = Direction.N,
         private val blockingObstacle: Obstacle) : Mouse(grid, position, direction) {
 
     fun broadcastObstacle() : Obstacle {
@@ -72,24 +74,7 @@ class ReadyMouse(
     }
 
     override fun doCommand(mouseAction: MouseAction) : Mouse {
-
-        when (mouseAction) {
-
-            is MouseAction.MovementAction -> {
-                return mouseAction.move(grid, position, direction)
-                        .fold({
-                            BlockedMouse(grid, position, direction, it)
-                        }, {
-                            ReadyMouse(grid, it, direction)
-                        })
-            }
-
-            is MouseAction.TurningAction -> {
-                val newDirection = mouseAction.turn(direction)
-                return ReadyMouse(grid, position, newDirection)
-            }
-
-        }
+        return mouseAction.execute(grid, position, direction)
     }
 
 }

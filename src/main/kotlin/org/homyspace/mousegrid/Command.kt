@@ -1,50 +1,58 @@
 /*
- * It's responsible for defining mouse commands
+ * It's responsible for defining mouse commands an actions
  */
 package org.homyspace.mousegrid
 
-import arrow.core.Either
-
+/**
+ * Represents one-to-one relationship between a given Command and mouse Action
+ */
 enum class Command(val mouseAction: MouseAction) {
-    F (MoveForward),
-    B (MoveBackwards),
-    L (TurnLeft),
-    R (TurnRight)
+    F (MoveStepForward),
+    B (MoveStepBackwards),
+    L (SteppedTurnLeft),
+    R (SteppedTurnRight)
 }
 
-sealed class MouseAction {
-    abstract class TurningAction : MouseAction() {
-        abstract fun turn(currentDirection: Direction): Direction
-    }
-    abstract class MovementAction : MouseAction() {
-        abstract fun move(grid: Grid, currentPosition: PositivePoint, currentDirection: Direction):
-                Either<Obstacle, PositivePoint>
-    }
+/**
+ * Represent an arbitrary action mouse can carry on
+ */
+interface MouseAction {
+    fun execute(grid: Grid, currentPosition: PositivePoint, currentDirection: Direction): Mouse
 }
 
-object TurnLeft : MouseAction.TurningAction() {
-    override fun turn(currentDirection: Direction): Direction {
-        return currentDirection.nextCounterClockwise()
-    }
-}
+// --- Actions
 
-object TurnRight : MouseAction.TurningAction() {
-    override fun turn(currentDirection: Direction): Direction {
-        return currentDirection.nextClockwise()
+object SteppedTurnLeft : MouseAction {
+    override fun execute(grid: Grid, currentPosition: PositivePoint, currentDirection: Direction): Mouse {
+        return ReadyMouse(grid, currentPosition, currentDirection.nextCounterClockwise())
     }
 }
 
-object MoveForward : MouseAction.MovementAction() {
-    override fun move(grid: Grid, currentPosition: PositivePoint, currentDirection: Direction):
-            Either<Obstacle, PositivePoint> {
+object SteppedTurnRight : MouseAction {
+    override fun execute(grid: Grid, currentPosition: PositivePoint, currentDirection: Direction): Mouse {
+        return ReadyMouse(grid, currentPosition, currentDirection.nextClockwise())
+    }
+}
+
+object MoveStepForward : MouseAction {
+    override fun execute(grid: Grid, currentPosition: PositivePoint, currentDirection: Direction): Mouse {
         return grid.move(currentPosition, currentDirection.unitVector())
+                .fold({
+                    BlockedMouse(grid, currentPosition, currentDirection, it)
+                }, {
+                    ReadyMouse(grid, it, currentDirection)
+                })
     }
 }
 
-object MoveBackwards : MouseAction.MovementAction() {
-    override fun move(grid: Grid, currentPosition: PositivePoint, currentDirection: Direction):
-            Either<Obstacle, PositivePoint> {
+object MoveStepBackwards : MouseAction {
+    override fun execute(grid: Grid, currentPosition: PositivePoint, currentDirection: Direction): Mouse {
         return grid.move(currentPosition, currentDirection.unitVector().invertWay())
+                .fold({
+                    BlockedMouse(grid, currentPosition, currentDirection, it)
+                }, {
+                    ReadyMouse(grid, it, currentDirection)
+                })
     }
 }
 
