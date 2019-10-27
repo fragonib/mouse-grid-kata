@@ -6,7 +6,7 @@ package org.homyspace.mousegrid
 abstract class Mouse(
         protected val grid: Grid,
         protected val position: PositivePoint,
-        protected val direction: Direction) {
+        protected val direction: Direction) : CommandReader, CommandExecutor {
 
     init {
         require(grid.containsPoint(position)) {
@@ -35,12 +35,25 @@ abstract class Mouse(
                 .fold(this, { mouse, command -> mouse.doCommand(command) })
     }
 
-    abstract fun readCommand(commandChar: Char) : MouseAction
+}
 
-    abstract fun doCommand(mouseAction: MouseAction): Mouse
+/**
+ * A mouse that is able to execute new commands
+ */
+class ReadyMouse(
+        grid: Grid = Grid(),
+        position: PositivePoint = PositivePoint(),
+        direction: Direction = Direction.N) : Mouse(grid, position, direction) {
+
+    override fun doCommand(mouseAction: MouseAction) : Mouse {
+        return mouseAction.execute(grid, position, direction)
+    }
 
 }
 
+/**
+ * A blocked mouse can't execute new commands and reports the obstacle is blocking it
+ */
 class BlockedMouse(
         grid: Grid = Grid(),
         position: PositivePoint = PositivePoint(),
@@ -51,30 +64,8 @@ class BlockedMouse(
         return blockingObstacle
     }
 
-    override fun readCommand(commandChar: Char) : MouseAction {
-        return Command.valueOf(commandChar.toString()).mouseAction
-    }
-
-    /**
-     * A blocked mouse can't execute new commands
-     */
     override fun doCommand(mouseAction: MouseAction): Mouse {
         return this
-    }
-
-}
-
-class ReadyMouse(
-        grid: Grid = Grid(),
-        position: PositivePoint = PositivePoint(),
-        direction: Direction = Direction.N) : Mouse(grid, position, direction) {
-
-    override fun readCommand(commandChar: Char) : MouseAction {
-        return Command.valueOf(commandChar.toString()).mouseAction
-    }
-
-    override fun doCommand(mouseAction: MouseAction) : Mouse {
-        return mouseAction.execute(grid, position, direction)
     }
 
 }

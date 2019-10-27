@@ -1,5 +1,5 @@
 /*
- * It's responsible for defining mouse commands an actions
+ * It's responsible for defining mouse commands and actions
  */
 package org.homyspace.mousegrid
 
@@ -13,14 +13,22 @@ enum class Command(val mouseAction: MouseAction) {
     R (SteppedTurnRight)
 }
 
+interface CommandReader {
+    fun readCommand(commandChar: Char) : MouseAction {
+        return Command.valueOf(commandChar.toString()).mouseAction
+    }
+}
+
+interface CommandExecutor {
+    fun doCommand(mouseAction: MouseAction) : Mouse
+}
+
 /**
  * Represent an arbitrary action mouse can carry on
  */
 interface MouseAction {
     fun execute(grid: Grid, currentPosition: PositivePoint, currentDirection: Direction): Mouse
 }
-
-// --- Actions
 
 object SteppedTurnLeft : MouseAction {
     override fun execute(grid: Grid, currentPosition: PositivePoint, currentDirection: Direction): Mouse {
